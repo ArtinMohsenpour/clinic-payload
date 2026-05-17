@@ -1,0 +1,188 @@
+@font-face {
+  font-family: 'BTrafcBd';
+  src: url('/fonts/BTrafcBd.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-body: 'BTrafcBd', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  --font-header: 'BTrafcBd', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  --nav-width: 380px; /* Increased from default ~250px-300px */
+}
+
+/* Custom Sidebar styling for Persian language - Only for Desktop/Large screens */
+@media (min-width: 1024px) {
+  .nav {
+    width: var(--nav-width) !important;
+    min-width: 220px !important;
+  }
+
+  /* Adjust the main content to account for the wider sidebar - handling both LTR and RTL */
+  .template-default {
+    padding-left: 30px !important;
+  }
+
+  [dir="rtl"] .template-default {
+    padding-left: 0 !important;
+    padding-right: 10px !important;
+  }
+}
+
+/* Vertical padding between sidebar menu items - Keep for all screen sizes for better readability */
+.nav .nav-group,
+.nav .nav__link,
+.nav .nav__button {
+  margin-bottom: 0.6rem !important; /* Slightly more space */
+}
+
+/* On mobile, only show the sidebar menu when it's open, hide main content */
+@media (max-width: 1023px) {
+  /* Hide the rest of the template content when the nav header says it's open */
+  .template-default--nav-open .template-default__wrap {
+    display: none !important;
+  }
+  
+  /* When navigation is open, make sure the nav itself is full width and visible, 
+     covering the screen since the content is hidden. */
+  .nav {
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+
+  /* Fix overlapping icons in the mobile header */
+  .app-header__wrapper {
+    justify-content: space-between !important;
+    gap: 1rem !important;
+  }
+
+  .app-header__controls-wrapper {
+    justify-content: flex-end !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Adjust account/avatar spacing */
+  .app-header__account {
+    margin-left: 0.5rem !important;
+    order: 3 !important;
+  }
+
+  [dir="rtl"] .app-header__account {
+    margin-left: 0 !important;
+    margin-right: 0.5rem !important;
+    order: 3 !important;
+  }
+
+  .app-header__actions-wrapper {
+    order: 1 !important;
+    margin-right: 0 !important;
+  }
+}
+
+.nav .nav__link {
+  display: flex !important;
+  align-items: center !important;
+  padding-top: 0.8rem !important; /* Increased vertical padding */
+  padding-bottom: 0.8rem !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+body, .payload-admin {
+  font-family: var(--font-body) !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-header) !important;
+}
+
+/* Bigger text for desktop */
+@media (min-width: 1024px) {
+  :root {
+    --base: 28px; /* Default is usually 16px or smaller */
+    --font-size-base: 28px;
+  }
+  
+  body, .payload-admin {
+    font-size: 1.3rem !important;
+  }
+
+  /* Target common admin elements specifically if needed */
+  .collection-list__wrap, .form-fields, .dashboard__card {
+    font-size: 1.2rem;
+  }
+}
+
+/* Custom Welcome Message styling */
+.custom-welcome-message {
+  padding: 1.5rem 1rem;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--theme-text);
+  border-bottom: 1px solid var(--theme-elevation-100);
+  margin-bottom: 1rem;
+}
+
+/* LTR fields — slug, phone, email, URL, time */
+/* .field-ltr is added via admin.className in each field definition */
+.field-ltr input,
+.field-ltr textarea {
+  direction: ltr !important;
+  text-align: left !important;
+  font-family: ui-monospace, 'SF Mono', 'Fira Code', Menlo, monospace !important;
+  letter-spacing: 0.02em;
+}
+
+/* Fallback CSS selectors for any remaining fields not using .field-ltr */
+.payload-admin {
+  input[name="email"],
+  input[name="password"],
+  input[name$="themeColor"],
+  input[name$="phoneNumber"],
+  input[name$="phoneNumbers.number"],
+  input[name$="emailAddress"],
+  input[name$="source"],
+  input[name$="url"],
+  input[name$=".url"],
+  input[name$="slug"],
+  input[name$=".slug"],
+  input[type="number"],
+  input[id^="field-email"],
+  input[id^="field-password"],
+  input[id*="themeColor"],
+  input[id*="phoneNumber"],
+  input[id*="source"],
+  input[id*="url"],
+  input[id*="slug"],
+  input[id*="number"],
+  .field-type.number input,
+  .field-type.email input,
+  .field-type.password input {
+    direction: ltr !important;
+    text-align: left !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  }
+
+  /* Target fields in the Users collection edit view to reduce width */
+  .collection-users {
+    .field-type.email, 
+    .field-type.password {
+      max-width: 400px;
+    }
+  }
+
+  /* List view adjustments if needed */
+  .users .table__header .email,
+  .users .table__cell.email {
+    max-width: 250px;
+  }
+
+  /* Target fields on the login page specifically if needed */
+  .template-login {
+    .field-type.email, 
+    .field-type.password {
+      /* Usually login fields are centered and reasonable width, but ensure LTR */
+    }
+  }
+}

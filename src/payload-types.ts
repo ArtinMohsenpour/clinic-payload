@@ -69,6 +69,15 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    departments: Department;
+    cities: City;
+    news: News;
+    blog: Blog;
+    services: Service;
+    branches: Branch;
+    'audit-logs': AuditLog;
+    insurances: Insurance;
+    about: About;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,17 +87,40 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    departments: DepartmentsSelect<false> | DepartmentsSelect<true>;
+    cities: CitiesSelect<false> | CitiesSelect<true>;
+    news: NewsSelect<false> | NewsSelect<true>;
+    blog: BlogSelect<false> | BlogSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
+    branches: BranchesSelect<false> | BranchesSelect<true>;
+    'audit-logs': AuditLogsSelect<false> | AuditLogsSelect<true>;
+    insurances: InsurancesSelect<false> | InsurancesSelect<true>;
+    about: AboutSelect<false> | AboutSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    navbar: Navbar;
+    footer: Footer;
+    contact: Contact;
+    privacy: Privacy;
+    'opening-hours': OpeningHour;
+    'site-settings': SiteSetting;
+  };
+  globalsSelect: {
+    navbar: NavbarSelect<false> | NavbarSelect<true>;
+    footer: FooterSelect<false> | FooterSelect<true>;
+    contact: ContactSelect<false> | ContactSelect<true>;
+    privacy: PrivacySelect<false> | PrivacySelect<true>;
+    'opening-hours': OpeningHoursSelect<false> | OpeningHoursSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -122,7 +154,16 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
+  fullName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  profileImage?: (number | null) | Media;
+  phoneNumber?: string | null;
+  department?: (number | null) | Department;
+  branch?: (number | null) | Branch;
+  role: 'admin' | 'ceo' | 'nurse' | 'doctor' | 'content-editor' | 'manager' | 'accountant';
+  showInTeam?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -147,7 +188,7 @@ export interface User {
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt: string;
   updatedAt: string;
   createdAt: string;
@@ -163,10 +204,511 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "departments".
+ */
+export interface Department {
+  id: number;
+  name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "branches".
+ */
+export interface Branch {
+  id: number;
+  /**
+   * فقط حروف انگلیسی، اعداد و خط‌تیره (مثلا tabriz-branch)
+   */
+  slug?: string | null;
+  title: string;
+  /**
+   * تصویر برای پس‌زمینه هیرو یا لیست شعب (Image for hero or branches list background)
+   */
+  bgImage?: (number | null) | Media;
+  city: number | City;
+  phones?:
+    | {
+        label: string;
+        number: string;
+        id?: string | null;
+      }[]
+    | null;
+  email?: string | null;
+  introduction?: {
+    title?: string | null;
+    subtitle?: string | null;
+    text?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    image?: (number | null) | Media;
+  };
+  address: {
+    text: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    googleMapsLink: {
+      label: string;
+      type: 'customUrl' | 'reference';
+      url?: string | null;
+      slug?: string | null;
+    };
+  };
+  services?: (number | Service)[] | null;
+  gallery?:
+    | {
+        media: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * این فیلدها به بهبود رتبه‌بندی سایت در گوگل کمک می‌کنند
+   */
+  seo?: {
+    /**
+     * عنوانی که در نتایج گوگل نمایش داده می‌شود — بهترین طول: ۵۰ تا ۶۰ کاراکتر
+     */
+    metaTitle?: string | null;
+    /**
+     * توضیحات خلاصه که در نتایج گوگل زیر عنوان نشان داده می‌شود — بهترین طول: ۱۵۰ تا ۱۶۰ کاراکتر
+     */
+    metaDescription?: string | null;
+    /**
+     * کلمات کلیدی مرتبط برای موتورهای جستجو
+     */
+    keywords?:
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * عنوانی که هنگام اشتراک‌گذاری در واتساپ، تلگرام و اینستاگرام نمایش داده می‌شود
+     */
+    ogTitle?: string | null;
+    /**
+     * توضیح مختصری که در پیش‌نمایش لینک در شبکه‌های اجتماعی نمایش داده می‌شود
+     */
+    ogDescription?: string | null;
+    /**
+     * تصویر نمایش داده شده هنگام اشتراک‌گذاری لینک — اندازه توصیه شده: ۱۲۰۰×۶۳۰ پیکسل
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * برای لینک مستقیم به این بخش (مثلاً: who-we-are → yoursite.com/#who-we-are). فقط حروف انگلیسی و خط تیره
+     */
+    anchorId?: string | null;
+    /**
+     * اگر فعال باشد، این محتوا در گوگل نمایش داده نخواهد شد
+     */
+    noIndex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cities".
+ */
+export interface City {
+  id: number;
+  name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  _order?: string | null;
+  /**
+   * نامک برای آدرس صفحه (مثلا dialysis) — فقط حروف انگلیسی، اعداد و خط‌تیره
+   */
+  slug?: string | null;
+  title: string;
+  image: number | Media;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * یک رنگ را از لیست انتخاب کنید (Select a color from the list)
+   */
+  themeColor?: string | null;
+  detailedDescription?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  history?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  gallery?:
+    | {
+        media: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * این فیلدها به بهبود رتبه‌بندی سایت در گوگل کمک می‌کنند
+   */
+  seo?: {
+    /**
+     * عنوانی که در نتایج گوگل نمایش داده می‌شود — بهترین طول: ۵۰ تا ۶۰ کاراکتر
+     */
+    metaTitle?: string | null;
+    /**
+     * توضیحات خلاصه که در نتایج گوگل زیر عنوان نشان داده می‌شود — بهترین طول: ۱۵۰ تا ۱۶۰ کاراکتر
+     */
+    metaDescription?: string | null;
+    /**
+     * کلمات کلیدی مرتبط برای موتورهای جستجو
+     */
+    keywords?:
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * عنوانی که هنگام اشتراک‌گذاری در واتساپ، تلگرام و اینستاگرام نمایش داده می‌شود
+     */
+    ogTitle?: string | null;
+    /**
+     * توضیح مختصری که در پیش‌نمایش لینک در شبکه‌های اجتماعی نمایش داده می‌شود
+     */
+    ogDescription?: string | null;
+    /**
+     * تصویر نمایش داده شده هنگام اشتراک‌گذاری لینک — اندازه توصیه شده: ۱۲۰۰×۶۳۰ پیکسل
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * برای لینک مستقیم به این بخش (مثلاً: who-we-are → yoursite.com/#who-we-are). فقط حروف انگلیسی و خط تیره
+     */
+    anchorId?: string | null;
+    /**
+     * اگر فعال باشد، این محتوا در گوگل نمایش داده نخواهد شد
+     */
+    noIndex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news".
+ */
+export interface News {
+  id: number;
+  _order?: string | null;
+  /**
+   * نامک برای آدرس صفحه (مثلا clinic-opening) — فقط حروف انگلیسی، اعداد و خط‌تیره
+   */
+  slug: string;
+  title: string;
+  /**
+   * تصویر، گیف یا ویدیو برای پس‌زمینه هیرو در صفحه اصلی (Image, GIF, Video)
+   */
+  thumbnail: number | Media;
+  text: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * یک رنگ را از لیست انتخاب کنید (Select a color from the list)
+   */
+  themeColor?: string | null;
+  branch?: (number | null) | Branch;
+  gallery?:
+    | {
+        media: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  author?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog".
+ */
+export interface Blog {
+  id: number;
+  /**
+   * نامک برای آدرس صفحه (مثلا diet-tips) — فقط حروف انگلیسی، اعداد و خط‌تیره
+   */
+  slug?: string | null;
+  title: string;
+  /**
+   * تصویر برای پس‌زمینه هیرو در صفحه جزئیات مقاله (Image for article hero)
+   */
+  thumbnail: number | Media;
+  text: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * یک رنگ را از لیست انتخاب کنید (Select a color from the list)
+   */
+  themeColor?: string | null;
+  gallery?:
+    | {
+        media: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  author?: (number | null) | User;
+  source?: string | null;
+  /**
+   * این فیلدها به بهبود رتبه‌بندی سایت در گوگل کمک می‌کنند
+   */
+  seo?: {
+    /**
+     * عنوانی که در نتایج گوگل نمایش داده می‌شود — بهترین طول: ۵۰ تا ۶۰ کاراکتر
+     */
+    metaTitle?: string | null;
+    /**
+     * توضیحات خلاصه که در نتایج گوگل زیر عنوان نشان داده می‌شود — بهترین طول: ۱۵۰ تا ۱۶۰ کاراکتر
+     */
+    metaDescription?: string | null;
+    /**
+     * کلمات کلیدی مرتبط برای موتورهای جستجو
+     */
+    keywords?:
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * عنوانی که هنگام اشتراک‌گذاری در واتساپ، تلگرام و اینستاگرام نمایش داده می‌شود
+     */
+    ogTitle?: string | null;
+    /**
+     * توضیح مختصری که در پیش‌نمایش لینک در شبکه‌های اجتماعی نمایش داده می‌شود
+     */
+    ogDescription?: string | null;
+    /**
+     * تصویر نمایش داده شده هنگام اشتراک‌گذاری لینک — اندازه توصیه شده: ۱۲۰۰×۶۳۰ پیکسل
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * برای لینک مستقیم به این بخش (مثلاً: who-we-are → yoursite.com/#who-we-are). فقط حروف انگلیسی و خط تیره
+     */
+    anchorId?: string | null;
+    /**
+     * اگر فعال باشد، این محتوا در گوگل نمایش داده نخواهد شد
+     */
+    noIndex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-logs".
+ */
+export interface AuditLog {
+  id: number;
+  user: number | User;
+  collectionName: string;
+  docId: string;
+  docTitle?: string | null;
+  action: 'create' | 'update' | 'delete' | 'publish';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "insurances".
+ */
+export interface Insurance {
+  id: number;
+  _order?: string | null;
+  title: string;
+  description?: string | null;
+  logo: number | Media;
+  coverage?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * یک رنگ را از لیست انتخاب کنید (Select a color from the list)
+   */
+  themeColor?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about".
+ */
+export interface About {
+  id: number;
+  _order?: string | null;
+  title: string;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  image: number | Media;
+  themeColor?: string | null;
+  /**
+   * این فیلدها به بهبود رتبه‌بندی سایت در گوگل کمک می‌کنند
+   */
+  seo?: {
+    /**
+     * عنوانی که در نتایج گوگل نمایش داده می‌شود — بهترین طول: ۵۰ تا ۶۰ کاراکتر
+     */
+    metaTitle?: string | null;
+    /**
+     * توضیحات خلاصه که در نتایج گوگل زیر عنوان نشان داده می‌شود — بهترین طول: ۱۵۰ تا ۱۶۰ کاراکتر
+     */
+    metaDescription?: string | null;
+    /**
+     * کلمات کلیدی مرتبط برای موتورهای جستجو
+     */
+    keywords?:
+      | {
+          keyword: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * عنوانی که هنگام اشتراک‌گذاری در واتساپ، تلگرام و اینستاگرام نمایش داده می‌شود
+     */
+    ogTitle?: string | null;
+    /**
+     * توضیح مختصری که در پیش‌نمایش لینک در شبکه‌های اجتماعی نمایش داده می‌شود
+     */
+    ogDescription?: string | null;
+    /**
+     * تصویر نمایش داده شده هنگام اشتراک‌گذاری لینک — اندازه توصیه شده: ۱۲۰۰×۶۳۰ پیکسل
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * برای لینک مستقیم به این بخش (مثلاً: who-we-are → yoursite.com/#who-we-are). فقط حروف انگلیسی و خط تیره
+     */
+    anchorId?: string | null;
+    /**
+     * اگر فعال باشد، این محتوا در گوگل نمایش داده نخواهد شد
+     */
+    noIndex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: string;
+  id: number;
   key: string;
   data:
     | {
@@ -183,20 +725,56 @@ export interface PayloadKv {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'departments';
+        value: number | Department;
+      } | null)
+    | ({
+        relationTo: 'cities';
+        value: number | City;
+      } | null)
+    | ({
+        relationTo: 'news';
+        value: number | News;
+      } | null)
+    | ({
+        relationTo: 'blog';
+        value: number | Blog;
+      } | null)
+    | ({
+        relationTo: 'services';
+        value: number | Service;
+      } | null)
+    | ({
+        relationTo: 'branches';
+        value: number | Branch;
+      } | null)
+    | ({
+        relationTo: 'audit-logs';
+        value: number | AuditLog;
+      } | null)
+    | ({
+        relationTo: 'insurances';
+        value: number | Insurance;
+      } | null)
+    | ({
+        relationTo: 'about';
+        value: number | About;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -206,10 +784,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -229,7 +807,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -240,6 +818,15 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  fullName?: T;
+  firstName?: T;
+  lastName?: T;
+  profileImage?: T;
+  phoneNumber?: T;
+  department?: T;
+  branch?: T;
+  role?: T;
+  showInTeam?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -274,6 +861,245 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "departments_select".
+ */
+export interface DepartmentsSelect<T extends boolean = true> {
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cities_select".
+ */
+export interface CitiesSelect<T extends boolean = true> {
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news_select".
+ */
+export interface NewsSelect<T extends boolean = true> {
+  _order?: T;
+  slug?: T;
+  title?: T;
+  thumbnail?: T;
+  text?: T;
+  themeColor?: T;
+  branch?: T;
+  gallery?:
+    | T
+    | {
+        media?: T;
+        id?: T;
+      };
+  author?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog_select".
+ */
+export interface BlogSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  thumbnail?: T;
+  text?: T;
+  themeColor?: T;
+  gallery?:
+    | T
+    | {
+        media?: T;
+        id?: T;
+      };
+  author?: T;
+  source?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        keywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        anchorId?: T;
+        noIndex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  _order?: T;
+  slug?: T;
+  title?: T;
+  image?: T;
+  description?: T;
+  themeColor?: T;
+  detailedDescription?: T;
+  history?: T;
+  gallery?:
+    | T
+    | {
+        media?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        keywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        anchorId?: T;
+        noIndex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "branches_select".
+ */
+export interface BranchesSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  bgImage?: T;
+  city?: T;
+  phones?:
+    | T
+    | {
+        label?: T;
+        number?: T;
+        id?: T;
+      };
+  email?: T;
+  introduction?:
+    | T
+    | {
+        title?: T;
+        subtitle?: T;
+        text?: T;
+        image?: T;
+      };
+  address?:
+    | T
+    | {
+        text?: T;
+        googleMapsLink?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              url?: T;
+              slug?: T;
+            };
+      };
+  services?: T;
+  gallery?:
+    | T
+    | {
+        media?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        keywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        anchorId?: T;
+        noIndex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-logs_select".
+ */
+export interface AuditLogsSelect<T extends boolean = true> {
+  user?: T;
+  collectionName?: T;
+  docId?: T;
+  docTitle?: T;
+  action?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "insurances_select".
+ */
+export interface InsurancesSelect<T extends boolean = true> {
+  _order?: T;
+  title?: T;
+  description?: T;
+  logo?: T;
+  coverage?: T;
+  themeColor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about_select".
+ */
+export interface AboutSelect<T extends boolean = true> {
+  _order?: T;
+  title?: T;
+  description?: T;
+  image?: T;
+  themeColor?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        keywords?:
+          | T
+          | {
+              keyword?: T;
+              id?: T;
+            };
+        ogTitle?: T;
+        ogDescription?: T;
+        ogImage?: T;
+        anchorId?: T;
+        noIndex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -314,6 +1140,587 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navbar".
+ */
+export interface Navbar {
+  id: number;
+  logo: number | Media;
+  navItems?:
+    | {
+        type: 'link' | 'dropdown';
+        link?: {
+          label: string;
+          type: 'customUrl' | 'reference';
+          url?: string | null;
+          slug?: string | null;
+        };
+        dropdownLabel?: string | null;
+        dropdownItems?:
+          | {
+              link: {
+                label: string;
+                type: 'customUrl' | 'reference';
+                url?: string | null;
+                slug?: string | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer".
+ */
+export interface Footer {
+  id: number;
+  logo: number | Media;
+  columns?:
+    | {
+        blocks?:
+          | (
+              | {
+                  content: {
+                    root: {
+                      type: string;
+                      children: {
+                        type: any;
+                        version: number;
+                        [k: string]: unknown;
+                      }[];
+                      direction: ('ltr' | 'rtl') | null;
+                      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                      indent: number;
+                      version: number;
+                    };
+                    [k: string]: unknown;
+                  };
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'footerRichText';
+                }
+              | {
+                  link: {
+                    label: string;
+                    type: 'customUrl' | 'reference';
+                    url?: string | null;
+                    slug?: string | null;
+                  };
+                  id?: string | null;
+                  blockName?: string | null;
+                  blockType: 'footerLink';
+                }
+            )[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact".
+ */
+export interface Contact {
+  id: number;
+  pageTitle: string;
+  subtitle?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  phoneNumbers?:
+    | {
+        number: string;
+        id?: string | null;
+      }[]
+    | null;
+  address?: string | null;
+  googleMapsLink: {
+    label: string;
+    type: 'customUrl' | 'reference';
+    url?: string | null;
+    slug?: string | null;
+  };
+  emailAddress?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "privacy".
+ */
+export interface Privacy {
+  id: number;
+  pageTitle: string;
+  subtitle?: string | null;
+  content?:
+    | {
+        title: string;
+        body: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'privacyBlock';
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "opening-hours".
+ */
+export interface OpeningHour {
+  id: number;
+  weeklySchedule?: {
+    saturday?: {
+      isOpen?: boolean | null;
+      openTime?: string | null;
+      closeTime?: string | null;
+    };
+    sunday?: {
+      isOpen?: boolean | null;
+      openTime?: string | null;
+      closeTime?: string | null;
+    };
+    monday?: {
+      isOpen?: boolean | null;
+      openTime?: string | null;
+      closeTime?: string | null;
+    };
+    tuesday?: {
+      isOpen?: boolean | null;
+      openTime?: string | null;
+      closeTime?: string | null;
+    };
+    wednesday?: {
+      isOpen?: boolean | null;
+      openTime?: string | null;
+      closeTime?: string | null;
+    };
+    thursday?: {
+      isOpen?: boolean | null;
+      openTime?: string | null;
+      closeTime?: string | null;
+    };
+    friday?: {
+      isOpen?: boolean | null;
+      openTime?: string | null;
+      closeTime?: string | null;
+    };
+  };
+  exceptions?:
+    | {
+        date: string;
+        isClosed?: boolean | null;
+        openTime?: string | null;
+        closeTime?: string | null;
+        reason?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  /**
+   * نامی که در عنوان مرورگر و گوگل نمایش داده می‌شود
+   */
+  siteName: string;
+  /**
+   * توضیح کوتاه سایت — مثال: مرکز جامع دیالیز و درمانگاه
+   */
+  tagline?: string | null;
+  /**
+   * این توضیحات در صفحاتی که توضیح خاصی ندارند نمایش داده می‌شود — ۱۵۰ تا ۱۶۰ کاراکتر
+   */
+  defaultMetaDescription?: string | null;
+  /**
+   * کلمات کلیدی کلی سایت که در تمام صفحات اعمال می‌شوند
+   */
+  defaultKeywords?:
+    | {
+        keyword: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * تصویر پیش‌فرض برای لینک‌ها در واتساپ، تلگرام و شبکه‌های اجتماعی — ۱۲۰۰×۶۳۰ پیکسل
+   */
+  defaultOgImage?: (number | null) | Media;
+  /**
+   * کدی که از Google Search Console دریافت می‌کنید برای تأیید مالکیت سایت
+   */
+  googleVerification?: string | null;
+  /**
+   * مثال: @asrsalamat
+   */
+  twitterHandle?: string | null;
+  /**
+   * این اطلاعات به گوگل کمک می‌کند سازمان شما را شناسایی کند و در Knowledge Panel نمایش دهد
+   */
+  organization?: {
+    /**
+     * نام دقیق سازمان — مثال: مرکز درمانی عصر سلامت
+     */
+    name?: string | null;
+    legalName?: string | null;
+    /**
+     * توضیح جامع درباره سازمان برای موتورهای جستجو
+     */
+    description?: string | null;
+    /**
+     * لوگو برای Knowledge Panel گوگل — فرمت PNG با پس‌زمینه شفاف
+     */
+    logo?: (number | null) | Media;
+    /**
+     * مثال: https://asrsalamat.ir
+     */
+    url?: string | null;
+    /**
+     * مثال: +98-21-12345678
+     */
+    telephone?: string | null;
+    email?: string | null;
+    /**
+     * مثال: 2010
+     */
+    foundingDate?: string | null;
+    address?: {
+      streetAddress?: string | null;
+      addressLocality?: string | null;
+      addressRegion?: string | null;
+      postalCode?: string | null;
+      addressCountry?: string | null;
+    };
+    /**
+     * لینک به پروفایل سازمان در اینستاگرام، تلگرام، لینکدین و سایر شبکه‌ها — گوگل از این‌ها برای Knowledge Panel استفاده می‌کند
+     */
+    sameAs?:
+      | {
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * نوع دقیق‌تر به گوگل کمک می‌کند محتوا را بهتر دسته‌بندی کند
+     */
+    schemaType?: ('MedicalClinic' | 'Hospital' | 'MedicalOrganization' | 'Physician' | 'Organization') | null;
+  };
+  /**
+   * تنظیمات SEO خاص برای بخش درباره ما در صفحه اصلی
+   */
+  aboutSection?: {
+    /**
+     * عنوانی که در صفحه نمایش داده می‌شود و گوگل ایندکس می‌کند
+     */
+    heading?: string | null;
+    /**
+     * کاربران می‌توانند با yoursite.com/#who-we-are مستقیماً به این بخش برسند
+     */
+    anchorId?: string | null;
+    /**
+     * توضیح خلاصه از کل بخش درباره ما که در استراکچرد دیتا استفاده می‌شود
+     */
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navbar_select".
+ */
+export interface NavbarSelect<T extends boolean = true> {
+  logo?: T;
+  navItems?:
+    | T
+    | {
+        type?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              url?: T;
+              slug?: T;
+            };
+        dropdownLabel?: T;
+        dropdownItems?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    label?: T;
+                    type?: T;
+                    url?: T;
+                    slug?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "footer_select".
+ */
+export interface FooterSelect<T extends boolean = true> {
+  logo?: T;
+  columns?:
+    | T
+    | {
+        blocks?:
+          | T
+          | {
+              footerRichText?:
+                | T
+                | {
+                    content?: T;
+                    id?: T;
+                    blockName?: T;
+                  };
+              footerLink?:
+                | T
+                | {
+                    link?:
+                      | T
+                      | {
+                          label?: T;
+                          type?: T;
+                          url?: T;
+                          slug?: T;
+                        };
+                    id?: T;
+                    blockName?: T;
+                  };
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact_select".
+ */
+export interface ContactSelect<T extends boolean = true> {
+  pageTitle?: T;
+  subtitle?: T;
+  description?: T;
+  phoneNumbers?:
+    | T
+    | {
+        number?: T;
+        id?: T;
+      };
+  address?: T;
+  googleMapsLink?:
+    | T
+    | {
+        label?: T;
+        type?: T;
+        url?: T;
+        slug?: T;
+      };
+  emailAddress?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "privacy_select".
+ */
+export interface PrivacySelect<T extends boolean = true> {
+  pageTitle?: T;
+  subtitle?: T;
+  content?:
+    | T
+    | {
+        privacyBlock?:
+          | T
+          | {
+              title?: T;
+              body?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "opening-hours_select".
+ */
+export interface OpeningHoursSelect<T extends boolean = true> {
+  weeklySchedule?:
+    | T
+    | {
+        saturday?:
+          | T
+          | {
+              isOpen?: T;
+              openTime?: T;
+              closeTime?: T;
+            };
+        sunday?:
+          | T
+          | {
+              isOpen?: T;
+              openTime?: T;
+              closeTime?: T;
+            };
+        monday?:
+          | T
+          | {
+              isOpen?: T;
+              openTime?: T;
+              closeTime?: T;
+            };
+        tuesday?:
+          | T
+          | {
+              isOpen?: T;
+              openTime?: T;
+              closeTime?: T;
+            };
+        wednesday?:
+          | T
+          | {
+              isOpen?: T;
+              openTime?: T;
+              closeTime?: T;
+            };
+        thursday?:
+          | T
+          | {
+              isOpen?: T;
+              openTime?: T;
+              closeTime?: T;
+            };
+        friday?:
+          | T
+          | {
+              isOpen?: T;
+              openTime?: T;
+              closeTime?: T;
+            };
+      };
+  exceptions?:
+    | T
+    | {
+        date?: T;
+        isClosed?: T;
+        openTime?: T;
+        closeTime?: T;
+        reason?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  siteName?: T;
+  tagline?: T;
+  defaultMetaDescription?: T;
+  defaultKeywords?:
+    | T
+    | {
+        keyword?: T;
+        id?: T;
+      };
+  defaultOgImage?: T;
+  googleVerification?: T;
+  twitterHandle?: T;
+  organization?:
+    | T
+    | {
+        name?: T;
+        legalName?: T;
+        description?: T;
+        logo?: T;
+        url?: T;
+        telephone?: T;
+        email?: T;
+        foundingDate?: T;
+        address?:
+          | T
+          | {
+              streetAddress?: T;
+              addressLocality?: T;
+              addressRegion?: T;
+              postalCode?: T;
+              addressCountry?: T;
+            };
+        sameAs?:
+          | T
+          | {
+              url?: T;
+              id?: T;
+            };
+        schemaType?: T;
+      };
+  aboutSection?:
+    | T
+    | {
+        heading?: T;
+        anchorId?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
