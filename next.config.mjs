@@ -1,13 +1,13 @@
 import { withPayload } from '@payloadcms/next/withPayload'
-import type { NextConfig } from 'next'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
-const nextConfig: NextConfig = {
-  output: 'standalone', // <-- This line prevents Liara's script crash
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'standalone',
   images: {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
