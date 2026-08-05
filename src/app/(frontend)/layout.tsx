@@ -1,6 +1,8 @@
 import React from 'react'
 import type { Metadata } from 'next'
 import './styles.css'
+
+export const dynamic = 'force-dynamic'
 import { Navbar } from '@/components/Navbar/Navbar'
 import { Footer } from '@/components/Footer/Footer'
 import { getNavbar } from '@/lib/data/navbar'
