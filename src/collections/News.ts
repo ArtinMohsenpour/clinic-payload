@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { adminCeoManager, adminCeoManagerEditorMedical, anyone } from '../access/hasRole'
+import { adminCeoManagerEditor, anyone } from '../access/hasRole'
 import { logChange, logDelete } from '../hooks/logAudit'
 import { normalizeSlug } from '../hooks/normalizeToLatin'
 
@@ -18,10 +18,10 @@ export const News: CollectionConfig = {
     plural: 'اخبار (News)',
   },
   access: {
-    create: adminCeoManagerEditorMedical,
+    create: adminCeoManagerEditor,
     read: anyone,
-    update: adminCeoManagerEditorMedical,
-    delete: adminCeoManagerEditorMedical,
+    update: adminCeoManagerEditor,
+    delete: adminCeoManagerEditor,
   },
   hooks: {
     afterChange: [logChange('news')],

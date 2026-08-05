@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { adminCeoManagerEditorMedical } from '../access/hasRole'
+import { adminCeoManagerEditor } from '../access/hasRole'
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -10,9 +10,9 @@ export const Media: CollectionConfig = {
   admin: {},
   access: {
     read: () => true,
-    create: adminCeoManagerEditorMedical,
-    update: adminCeoManagerEditorMedical,
-    delete: adminCeoManagerEditorMedical,
+    create: adminCeoManagerEditor,
+    update: adminCeoManagerEditor,
+    delete: adminCeoManagerEditor,
   },
   fields: [
     {

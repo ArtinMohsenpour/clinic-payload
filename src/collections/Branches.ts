@@ -10,10 +10,7 @@ export const Branches: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'city', 'createdAt'],
-    hidden: ({ user }) => {
-      if (!user) return true
-      return !['admin', 'ceo', 'manager', 'content-editor'].includes(user.role as string)
-    },
+    hidden: ({ user }) => !user,
   },
   labels: {
     singular: 'شعبه (Branch)',

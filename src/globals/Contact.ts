@@ -6,10 +6,7 @@ export const Contact: GlobalConfig = {
   slug: 'contact',
   label: 'تماس با ما (Contact Page)',
   admin: {
-    hidden: ({ user }) => {
-      if (!user) return true
-      return !['admin', 'ceo', 'manager', 'content-editor'].includes(user.role as string)
-    },
+    hidden: ({ user }) => !user,
   },
   access: {
     read: anyone,

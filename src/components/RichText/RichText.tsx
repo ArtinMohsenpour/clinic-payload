@@ -20,9 +20,10 @@ type RichTextProps = {
     root: LexicalNode
   }
   className?: string
+  disableLinks?: boolean
 }
 
-export const RichText: React.FC<RichTextProps> = ({ content, className }) => {
+export const RichText: React.FC<RichTextProps> = ({ content, className, disableLinks }) => {
   if (!content?.root?.children) return null
 
   const renderNode = (node: LexicalNode, index: number): React.ReactNode => {
@@ -86,6 +87,11 @@ export const RichText: React.FC<RichTextProps> = ({ content, className }) => {
       case 'link':
         const isCustom = node.fields?.linkType === 'custom'
         const href = isCustom ? node.fields?.url : `/${node.fields?.doc?.value}`
+
+        if (disableLinks) {
+          return <span key={index}>{node.children?.map(renderNode)}</span>
+        }
+
         return (
           <a
             key={index}

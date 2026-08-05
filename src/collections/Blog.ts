@@ -9,10 +9,7 @@ export const Blog: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'author', 'createdAt'],
-    hidden: ({ user }) => {
-      if (!user) return true
-      return !['admin', 'ceo', 'manager', 'content-editor'].includes(user.role as string)
-    },
+    hidden: ({ user }) => !user,
     pagination: {
       defaultLimit: 100,
     },

@@ -7,10 +7,7 @@ export const Departments: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name'],
-    hidden: ({ user }) => {
-      if (!user) return true
-      return !['admin', 'ceo', 'manager', 'content-editor'].includes(user.role as string)
-    },
+    hidden: ({ user }) => !user,
   },
   labels: {
     singular: 'دپارتمان (Department)',

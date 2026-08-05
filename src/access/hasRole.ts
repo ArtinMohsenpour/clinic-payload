@@ -19,12 +19,12 @@ export const adminCeoManagerEditor: Access = ({ req: { user } }) => {
 
 export const adminCeoManagerEditorMedical: Access = ({ req: { user } }) => {
   if (!user) return false
-  return ['admin', 'ceo', 'manager', 'content-editor', 'nurse', 'doctor', 'accountant'].includes(user.role as string)
+  return ['admin', 'ceo', 'manager', 'content-editor', 'nurse', 'doctor', 'accountant', 'stock-clerk'].includes(user.role as string)
 }
 
 export const adminCeoManagerMedical: Access = ({ req: { user } }) => {
   if (!user) return false
-  return ['admin', 'ceo', 'manager', 'nurse', 'doctor', 'accountant'].includes(user.role as string)
+  return ['admin', 'ceo', 'manager', 'nurse', 'doctor', 'accountant', 'stock-clerk'].includes(user.role as string)
 }
 
 export const anyone: Access = () => true

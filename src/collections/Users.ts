@@ -123,6 +123,7 @@ export const Users: CollectionConfig = {
         { label: 'ویراستار محتوا (Content Editor)', value: 'content-editor' },
         { label: 'مدیر (Manager)', value: 'manager' },
         { label: 'حسابدار (Accountant)', value: 'accountant' },
+        { label: 'انباردار (Stock Clerk)', value: 'stock-clerk' },
       ],
       label: 'نقش (Role)',
       saveToJWT: true,

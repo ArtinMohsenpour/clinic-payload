@@ -27,10 +27,7 @@ export const Privacy: GlobalConfig = {
   slug: 'privacy',
   label: 'حریم خصوصی (Data Privacy Page)',
   admin: {
-    hidden: ({ user }) => {
-      if (!user) return true
-      return !['admin', 'ceo', 'manager', 'content-editor'].includes(user.role as string)
-    },
+    hidden: ({ user }) => !user,
   },
   access: {
     read: anyone,

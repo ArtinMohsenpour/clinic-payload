@@ -1,5 +1,5 @@
 import type { GlobalConfig } from 'payload'
-import { adminCeoManagerEditorMedical, anyone } from '../access/hasRole'
+import { adminCeoManagerEditor, anyone } from '../access/hasRole'
 import { normalizeToLatin } from '../hooks/normalizeToLatin'
 
 const days = [
@@ -18,7 +18,7 @@ export const OpeningHours: GlobalConfig = {
   admin: {},
   access: {
     read: anyone,
-    update: adminCeoManagerEditorMedical,
+    update: adminCeoManagerEditor,
   },
   fields: [
     {

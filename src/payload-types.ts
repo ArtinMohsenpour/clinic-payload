@@ -162,7 +162,7 @@ export interface User {
   phoneNumber?: string | null;
   department?: (number | null) | Department;
   branch?: (number | null) | Branch;
-  role: 'admin' | 'ceo' | 'nurse' | 'doctor' | 'content-editor' | 'manager' | 'accountant';
+  role: 'admin' | 'ceo' | 'nurse' | 'doctor' | 'content-editor' | 'manager' | 'accountant' | 'stock-clerk';
   showInTeam?: boolean | null;
   updatedAt: string;
   createdAt: string;

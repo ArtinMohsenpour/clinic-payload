@@ -43,6 +43,7 @@ function TeamMemberCard({ member }: { member: User }) {
     'content-editor': 'ویراستار محتوا',
     manager: 'مدیر',
     accountant: 'حسابدار',
+    'stock-clerk': 'انباردار',
   }
 
   const roleLabel = roleLabels[member.role] || member.role

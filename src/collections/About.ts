@@ -8,10 +8,7 @@ export const About: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['_order', 'title', 'createdAt'],
-    hidden: ({ user }) => {
-      if (!user) return true
-      return !['admin', 'ceo', 'manager', 'content-editor'].includes(user.role as string)
-    },
+    hidden: ({ user }) => !user,
     pagination: {
       defaultLimit: 100,
     },

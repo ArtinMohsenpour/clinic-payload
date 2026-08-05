@@ -68,7 +68,7 @@ export const CollectionCarousel: React.FC<CollectionCarouselProps> = ({ title, i
               {/* Text Content Below */}
               <div className="mt-4 px-1 text-right">
                 <div className="text-white/50 text-xs md:text-sm mt-2 line-clamp-2 transition-colors duration-300 group-hover:[color:var(--theme-color)]">
-                  < RichText content={item.description || item.text} />
+                  <RichText content={item.description || item.text} disableLinks={true} />
                 </div>
               </div>
             </Link>

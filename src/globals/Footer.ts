@@ -41,10 +41,7 @@ export const Footer: GlobalConfig = {
   },
   admin: {
     hideAPIURL: false,
-    hidden: ({ user }) => {
-      if (!user) return true
-      return !['admin', 'ceo', 'manager', 'content-editor'].includes(user.role as string)
-    },
+    hidden: ({ user }) => !user,
   },
   fields: [
     {
