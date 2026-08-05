@@ -12,8 +12,8 @@ export const ColorDot: SelectFieldClientComponent = (props) => {
   const { value, setValue } = useField<string>({ path })
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const colorInputRef = useRef<HTMLInputElement>(null)
 
-  // Default color options to use when field is 'text' instead of 'select'
   const defaultOptions = useMemo(() => [
     { label: 'Primary (#2563eb)', value: '#2563eb' },
     { label: 'Secondary (#3b82f6)', value: '#3b82f6' },
@@ -32,8 +32,14 @@ export const ColorDot: SelectFieldClientComponent = (props) => {
     return effectiveOptions.find((opt: any) => (typeof opt === 'string' ? opt === value : opt.value === value))
   }, [effectiveOptions, value])
 
+  const isCustomColor = value && !selectedOption
+
   const selectedColor = typeof selectedOption === 'object' ? selectedOption?.value : (value as string)
-  const selectedLabel = typeof selectedOption === 'object' ? (typeof selectedOption?.label === 'string' ? selectedOption.label : JSON.stringify(selectedOption.label)) : (value as string)
+  const selectedLabel = isCustomColor
+    ? `رنگ دلخواه (${value})`
+    : typeof selectedOption === 'object'
+      ? (typeof selectedOption?.label === 'string' ? selectedOption.label : JSON.stringify(selectedOption.label))
+      : (value as string)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -48,8 +54,6 @@ export const ColorDot: SelectFieldClientComponent = (props) => {
   const renderLabel = (label: any) => {
     if (typeof label === 'string') return label
     if (typeof label === 'object' && label !== null) {
-      // In Payload, labels can be objects for localization (e.g. { en: 'Primary', fa: 'اصلی' })
-      // For now we'll just show the first available string or fall back to JSON
       return Object.values(label)[0] as string || JSON.stringify(label)
     }
     return String(label)
@@ -166,6 +170,56 @@ export const ColorDot: SelectFieldClientComponent = (props) => {
                 </div>
               )
             })}
+
+            {/* Custom Color Picker */}
+            <div
+              style={{
+                borderTop: '1px solid var(--theme-elevation-200)',
+                padding: '10px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                cursor: 'pointer',
+                background: isCustomColor ? 'var(--theme-elevation-200)' : 'transparent',
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--theme-elevation-100)')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = isCustomColor ? 'var(--theme-elevation-200)' : 'transparent')}
+              onClick={() => colorInputRef.current?.click()}
+            >
+              <div style={{ position: 'relative', width: '20px', height: '20px', flexShrink: 0 }}>
+                <div
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '4px',
+                    background: isCustomColor
+                      ? (value as string)
+                      : 'conic-gradient(from 0deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)',
+                    border: '1px solid var(--theme-elevation-300)',
+                  }}
+                />
+                <input
+                  ref={colorInputRef}
+                  type="color"
+                  value={(value as string) || '#2563eb'}
+                  onChange={(e) => setValue(e.target.value)}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    opacity: 0,
+                    width: '100%',
+                    height: '100%',
+                    cursor: 'pointer',
+                    border: 'none',
+                    padding: 0,
+                  }}
+                />
+              </div>
+              <span style={{ fontSize: '0.95rem', color: isCustomColor ? 'var(--theme-text)' : 'var(--theme-elevation-800)' }}>
+                {isCustomColor ? `رنگ دلخواه (${value})` : 'انتخاب رنگ دلخواه (Custom Color)'}
+              </span>
+            </div>
           </div>
         )}
       </div>

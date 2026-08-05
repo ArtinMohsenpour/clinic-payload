@@ -67,8 +67,8 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ news }) => {
       onTouchEnd={onTouchEnd}
       dir="rtl"
       style={
-        news[current]?.themeColor 
-          ? { boxShadow: `-5px 30px 60px -35px ${news[current].themeColor}50` }
+        news[current]?.themeColor
+          ? { boxShadow: `-5px 30px 60px -35px ${news[current].themeColor}30` }
           : {}
       }
     >
@@ -113,10 +113,10 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ news }) => {
 
                 <Link
                   href={`/news/${item.slug || item.id}`}
-                  className="px-6 py-1.5  mb-4 rounded-xl font-bold transition-all duration-300 w-fit border-2 hover:scale-105 hover:shadow-lg active:scale-95 bg-[color-mix(in_srgb,var(--theme-color),transparent_80%)] hover:bg-[var(--theme-color)]"
+                  className="px-6 py-1.5 mb-4 rounded-xl font-bold transition-all duration-300 w-fit border-2 hover:scale-105 hover:shadow-lg active:scale-95 bg-[color-mix(in_srgb,var(--theme-color),transparent_85%)] hover:bg-[color-mix(in_srgb,var(--theme-color),transparent_30%)]"
                   style={{
                     '--theme-color': item.themeColor || 'white',
-                    borderColor: item.themeColor || 'white',
+                    borderColor: item.themeColor ? `${item.themeColor}60` : 'rgba(255,255,255,0.5)',
                     color: 'white',
                   } as React.CSSProperties}
                 >
