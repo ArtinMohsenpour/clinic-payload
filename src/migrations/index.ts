@@ -1,9 +1,9 @@
-import * as migration_20260805_102050_feedback_ui_updated from './20260805_102050_feedback_ui_updated';
+import * as migration_20260805_163404 from './20260805_163404';
 
 export const migrations = [
   {
-    up: migration_20260805_102050_feedback_ui_updated.up,
-    down: migration_20260805_102050_feedback_ui_updated.down,
-    name: '20260805_102050_feedback_ui_updated'
+    up: migration_20260805_163404.up,
+    down: migration_20260805_163404.down,
+    name: '20260805_163404'
   },
 ];
