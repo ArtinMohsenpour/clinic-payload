@@ -26,6 +26,7 @@ import { ColorDot as ColorDot_9b49d6312a6608be7f3552398a3efcb3 } from '../../../
 import { default as default_25661eba232d98b73711a5a740eaa923 } from '../../../components/PersianDatePicker'
 import { default as default_9585e8ce45e423af3517811c48d570d6 } from '../../../components/ExceptionRowLabel'
 import { default as default_b53432b23293d9d00730621c9a8cf8a0 } from '../../../components/WelcomeMessage'
+import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
@@ -57,5 +58,6 @@ export const importMap = {
   "/components/PersianDatePicker#default": default_25661eba232d98b73711a5a740eaa923,
   "/components/ExceptionRowLabel#default": default_9585e8ce45e423af3517811c48d570d6,
   "/components/WelcomeMessage#default": default_b53432b23293d9d00730621c9a8cf8a0,
+  "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
