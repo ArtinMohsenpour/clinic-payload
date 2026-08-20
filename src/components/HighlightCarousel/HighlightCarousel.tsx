@@ -4,6 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { Carousel } from '../Carousel/Carousel'
 import type { Media } from '@/payload-types'
+import { CARD_VARIANTS, mediaSrcSet, mediaUrl } from '@/lib/media'
 import { RichText } from '@/components/RichText/RichText'
 import { ArrowLeft } from 'lucide-react'
 
@@ -20,7 +21,6 @@ export const HighlightCarousel: React.FC<HighlightCarouselProps> = ({
   linkPrefix,
   viewAllLink 
 }) => {
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
 
   return (
     <div className="w-full">
@@ -32,11 +32,8 @@ export const HighlightCarousel: React.FC<HighlightCarouselProps> = ({
         viewAllText="بیشتر"
         renderItem={(item: any) => {
           const image = item.thumbnail as Media
-          const imageUrl = image?.url
-            ? image.url.startsWith('http')
-              ? image.url
-              : `${serverUrl}${image.url}`
-            : null
+          const imageUrl = mediaUrl(image, 'feature')
+          const imageSrcSet = mediaSrcSet(image, CARD_VARIANTS)
 
           const themeColor = item.themeColor || '#E91E63'
 
@@ -54,7 +51,11 @@ export const HighlightCarousel: React.FC<HighlightCarouselProps> = ({
                 {imageUrl && (
                   <img
                     src={imageUrl}
+                    srcSet={imageSrcSet}
+                    sizes="(max-width: 768px) 280px, (max-width: 1024px) 450px, 540px"
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                 )}

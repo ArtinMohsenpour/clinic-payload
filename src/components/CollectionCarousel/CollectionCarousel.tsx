@@ -4,6 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { Carousel } from '../Carousel/Carousel'
 import type { Service, Media } from '@/payload-types'
+import { CARD_VARIANTS, mediaSrcSet, mediaUrl } from '@/lib/media'
 import { RichText } from '@/components/RichText/RichText'
 
 interface CollectionCarouselProps {
@@ -13,7 +14,6 @@ interface CollectionCarouselProps {
 }
 
 export const CollectionCarousel: React.FC<CollectionCarouselProps> = ({ title, items, linkPrefix }) => {
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
 
   return (
     <div className="w-full ">
@@ -24,12 +24,9 @@ export const CollectionCarousel: React.FC<CollectionCarouselProps> = ({ title, i
         viewAllLink={`/${linkPrefix}`}
         viewAllText="مشاهده همه"
         renderItem={(item: any) => {
-          const image = item.image || item.thumbnail as Media
-          const imageUrl = image?.url
-            ? image.url.startsWith('http')
-              ? image.url
-              : `${serverUrl}${image.url}`
-            : null
+          const image = (item.image || item.thumbnail) as Media
+          const imageUrl = mediaUrl(image, 'card')
+          const imageSrcSet = mediaSrcSet(image, CARD_VARIANTS)
 
           return (
             <Link
@@ -45,7 +42,11 @@ export const CollectionCarousel: React.FC<CollectionCarouselProps> = ({ title, i
                 {imageUrl && (
                   <img
                     src={imageUrl}
+                    srcSet={imageSrcSet}
+                    sizes="(max-width: 768px) 280px, 320px"
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 )}

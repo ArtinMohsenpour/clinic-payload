@@ -1,6 +1,7 @@
 import React from 'react'
 import { RichText } from '@/components/RichText/RichText'
 import type { About, Media } from '@/payload-types'
+import { CARD_VARIANTS, mediaSrcSet, mediaUrl } from '@/lib/media'
 
 interface AboutSectionProps {
   sections: About[]
@@ -13,8 +14,6 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
   sectionAnchorId = 'who-we-are',
   sectionHeading = 'ما که هستیم؟',
 }) => {
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
-
   if (!sections || sections.length === 0) return null
 
   return (
@@ -37,11 +36,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
             const isEven = index % 2 === 0
             const isLast = index === sections.length - 1
             const image = section.image as Media
-            const imageUrl = image?.url
-              ? image.url.startsWith('http')
-                ? image.url
-                : `${serverUrl}${image.url}`
-              : null
+            const imageUrl = mediaUrl(image, 'card')
+            const imageSrcSet = mediaSrcSet(image, CARD_VARIANTS)
 
             const themeColor = section.themeColor || (isEven ? '#2563eb' : '#e91e63')
             const seo = (section as any).seo
@@ -68,7 +64,11 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
                       {imageUrl && (
                         <img
                           src={imageUrl}
+                          srcSet={imageSrcSet}
+                          sizes="(max-width: 1024px) 100vw, 384px"
                           alt={seo?.metaDescription || section.title}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                       )}

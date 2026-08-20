@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import type { News, Media } from '@/payload-types'
+import { HERO_VARIANTS, isVideo, mediaSrcSet, mediaUrl } from '@/lib/media'
 import { RichText } from '../RichText/RichText'
 
 interface HeroSliderProps {
@@ -76,10 +77,10 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ news }) => {
       <div className="relative w-full h-full min-h-[500px] md:min-h-0">
         {news.map((item, index) => {
           const thumbnail = item.thumbnail as Media
-          const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
-          const imageUrl = thumbnail?.url 
-            ? (thumbnail.url.startsWith('http') ? thumbnail.url : `${serverUrl}${thumbnail.url}`)
-            : null
+          const imageUrl = mediaUrl(thumbnail, 'hero')
+          const imageSrcSet = mediaSrcSet(thumbnail, HERO_VARIANTS)
+          // The first slide is the largest above-the-fold asset; the rest can wait.
+          const showVideo = isVideo(thumbnail)
 
           return (
             <div
@@ -91,11 +92,28 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ news }) => {
               {/* Image Container */}
               {imageUrl && (
                 <div className="relative md:absolute md:inset-0 z-0 w-full aspect-video md:aspect-auto md:h-full">
-                  <img
-                    src={imageUrl}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
+                  {showVideo ? (
+                    <video
+                      src={imageUrl}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      preload="metadata"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={imageUrl}
+                      srcSet={imageSrcSet}
+                      sizes="100vw"
+                      alt=""
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      fetchPriority={index === 0 ? 'high' : 'auto'}
+                      decoding="async"
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                   {/* Overlay Gradient - Hidden on mobile, visible on desktop */}
                   <div className="hidden md:block absolute inset-0 bg-linear-to-l from-black/80 via-black/20 to-transparent"></div>
                 </div>

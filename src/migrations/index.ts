@@ -1,9 +1,15 @@
 import * as migration_20260805_163404 from './20260805_163404';
+import * as migration_20260820_163826_media_storage_restructure from './20260820_163826_media_storage_restructure';
 
 export const migrations = [
   {
     up: migration_20260805_163404.up,
     down: migration_20260805_163404.down,
-    name: '20260805_163404'
+    name: '20260805_163404',
+  },
+  {
+    up: migration_20260820_163826_media_storage_restructure.up,
+    down: migration_20260820_163826_media_storage_restructure.down,
+    name: '20260820_163826_media_storage_restructure'
   },
 ];

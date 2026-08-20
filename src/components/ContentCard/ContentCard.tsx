@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import type { Media } from '@/payload-types'
+import { CARD_VARIANTS, mediaSrcSet, mediaUrl } from '@/lib/media'
 import { RichText } from '@/components/RichText/RichText'
 
 interface ContentCardProps {
@@ -24,14 +25,8 @@ export const ContentCard: React.FC<ContentCardProps> = ({
   themeColor = '#2563eb',
   buttonText = 'ادامه مطلب',
 }) => {
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
-  
-  let imageUrl = null
-  if (typeof image === 'string') {
-    imageUrl = image.startsWith('http') ? image : `${serverUrl}${image}`
-  } else if (image && typeof image === 'object' && image.url) {
-    imageUrl = image.url.startsWith('http') ? image.url : `${serverUrl}${image.url}`
-  }
+  const imageUrl = mediaUrl(image, 'card')
+  const imageSrcSet = mediaSrcSet(image, CARD_VARIANTS)
 
   const imageAlt = (typeof image === 'object' && (image as Media)?.alt) || title
 
@@ -46,7 +41,11 @@ export const ContentCard: React.FC<ContentCardProps> = ({
           {imageUrl ? (
             <img
               src={imageUrl}
+              srcSet={imageSrcSet}
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
               alt=""
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
           ) : (

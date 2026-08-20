@@ -1,0 +1,25 @@
+# Liara builds the app remotely — never upload local build output or deps.
+node_modules
+.next
+out
+build
+
+# Local upload storage (real uploads live in the S3 bucket)
+media
+brand
+people
+documents
+
+# Dev-only
+.git
+.idea
+.vscode
+.cursor
+tests
+test-results
+playwright-report
+blob-report
+coverage
+*.tsbuildinfo
+.DS_Store
+docker-compose.yml

@@ -3,16 +3,16 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import type { Media, Navbar as NavbarType } from '@/payload-types'
+import type { Brand, Navbar as NavbarType } from '@/payload-types'
+import { mediaUrl } from '@/lib/media'
 
 export const Navbar = ({ navbar }: { navbar: NavbarType }) => {
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [openMobileDropdown, setOpenMobileDropdown] = useState<string | null>(null)
-  const logo = navbar?.logo as Media
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
-  const logoUrl = logo?.url ? (logo.url.startsWith('http') ? logo.url : `${serverUrl}${logo.url}`) : null
+  const logo = navbar?.logo as Brand
+  const logoUrl = mediaUrl(logo, 'small')
 
   useEffect(() => {
     const handleScroll = () => {

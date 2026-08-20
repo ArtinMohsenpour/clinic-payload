@@ -48,7 +48,7 @@ export const Footer: GlobalConfig = {
       name: 'logo',
       type: 'upload',
       label: 'لوگو (Logo)',
-      relationTo: 'media',
+      relationTo: 'brand',
       required: true,
     },
     {

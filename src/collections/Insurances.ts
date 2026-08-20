@@ -43,7 +43,7 @@ export const Insurances: CollectionConfig = {
     {
       name: 'logo',
       type: 'upload',
-      relationTo: 'media',
+      relationTo: 'brand',
       label: 'لوگو (Logo)',
       required: true,
     },

@@ -123,7 +123,7 @@ export const SiteSettings: GlobalConfig = {
         {
           name: 'logo',
           type: 'upload',
-          relationTo: 'media',
+          relationTo: 'brand',
           label: 'لوگو سازمان',
           admin: {
             description: 'لوگو برای Knowledge Panel گوگل — فرمت PNG با پس‌زمینه شفاف',

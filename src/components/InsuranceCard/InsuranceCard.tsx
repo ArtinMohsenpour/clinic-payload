@@ -1,7 +1,8 @@
 'use client'
 
 import React from 'react'
-import type { Insurance, Media } from '@/payload-types'
+import type { Brand, Insurance } from '@/payload-types'
+import { mediaUrl } from '@/lib/media'
 import { RichText } from '@/components/RichText/RichText'
 
 interface InsuranceCardProps {
@@ -9,13 +10,8 @@ interface InsuranceCardProps {
 }
 
 export const InsuranceCard: React.FC<InsuranceCardProps> = ({ insurance }) => {
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
-  const logo = insurance.logo as Media
-  const logoUrl = logo?.url
-    ? logo.url.startsWith('http')
-      ? logo.url
-      : `${serverUrl}${logo.url}`
-    : null
+  const logo = insurance.logo as Brand
+  const logoUrl = mediaUrl(logo, 'small')
 
   const themeColor = insurance.themeColor || '#2563eb'
 
@@ -38,6 +34,8 @@ export const InsuranceCard: React.FC<InsuranceCardProps> = ({ insurance }) => {
               <img
                 src={logoUrl}
                 alt={insurance.title}
+                loading="lazy"
+                decoding="async"
                 className="max-w-full max-h-full object-contain transition-transform duration-500"
               />
             ) : (

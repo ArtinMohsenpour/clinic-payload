@@ -9,6 +9,7 @@ import { ImageGallery } from '@/components/ImageGallery/ImageGallery'
 import { RichText } from '@/components/RichText/RichText'
 import { lexicalToPlainText } from '@/lib/lexicalUtils'
 import type { Media, Branch } from '@/payload-types'
+import { HERO_VARIANTS, mediaSrcSet, mediaUrl, toGalleryImages } from '@/lib/media'
 
 import { Phone, Mail, MapPin, ExternalLink } from 'lucide-react'
 
@@ -38,10 +39,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     `شعبه ${branch.title} مرکز جامع دیالیز و درمانگاه عصر سلامت`
 
   const ogImage = (branch.seo?.ogImage || branch.bgImage) as Media
-  const ogImageUrl = ogImage?.url
-    ? ogImage.url.startsWith('http')
-      ? ogImage.url
-      : `${serverUrl}${ogImage.url}`
+  const ogImagePath = mediaUrl(ogImage, 'og')
+  const ogImageUrl = ogImagePath
+    ? ogImagePath.startsWith('http')
+      ? ogImagePath
+      : `${serverUrl}${ogImagePath}`
     : undefined
 
   const keywords = branch.seo?.keywords?.map((k: any) => k.keyword) || []
@@ -76,20 +78,11 @@ export default async function BranchPage({ params }: PageProps) {
 
   const news = await getNewsByBranch(String(branch.id))
   
-  // Format gallery images for ImageGallery component
-  const galleryImages = (branch.gallery?.map((item) => item.media as Media) || [])
-    .filter(media => !!media?.url)
-    .map(media => ({
-      url: media.url as string,
-      alt: media.alt || ''
-    }))
+  const galleryImages = toGalleryImages(branch.gallery)
 
   const bgImage = branch.bgImage as Media
-  const bgImageUrl = bgImage?.url
-    ? bgImage.url.startsWith('http')
-      ? bgImage.url
-      : `${process.env.NEXT_PUBLIC_SERVER_URL || ''}${bgImage.url}`
-    : null
+  const bgImageUrl = mediaUrl(bgImage, 'hero')
+  const bgImageSrcSet = mediaSrcSet(bgImage, HERO_VARIANTS)
 
   return (
     <div className="relative min-h-screen flex flex-col gap-10 md:gap-16 pb-12 text-text overflow-hidden">
@@ -98,7 +91,11 @@ export default async function BranchPage({ params }: PageProps) {
         <div className="absolute inset-0 -z-20 w-full h-full">
           <img
             src={bgImageUrl}
+            srcSet={bgImageSrcSet}
+            sizes="100vw"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover fixed opacity-10"
           />
           <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] fixed"></div>
@@ -114,8 +111,12 @@ export default async function BranchPage({ params }: PageProps) {
           {branch.introduction.image && (
             <div className="absolute inset-0 z-0">
               <img
-                src={typeof branch.introduction.image === 'string' ? branch.introduction.image : (branch.introduction.image as Media).url || ''}
+                src={mediaUrl(branch.introduction.image, 'hero') || ''}
+                srcSet={mediaSrcSet(branch.introduction.image, HERO_VARIANTS)}
+                sizes="100vw"
                 alt={branch.introduction.title || ''}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-linear-to-t from-background via-background/40 to-transparent"></div>

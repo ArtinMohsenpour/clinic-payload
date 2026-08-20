@@ -1,12 +1,12 @@
 import React from 'react'
 import Link from 'next/link'
-import type { Footer as FooterType, Media } from '@/payload-types'
+import type { Brand, Footer as FooterType } from '@/payload-types'
+import { mediaUrl } from '@/lib/media'
 import { RichText } from '../RichText/RichText'
 
 export const Footer = ({ footer }: { footer: FooterType }) => {
-  const logo = footer?.logo as Media
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
-  const logoUrl = logo?.url ? (logo.url.startsWith('http') ? logo.url : `${serverUrl}${logo.url}`) : null
+  const logo = footer?.logo as Brand
+  const logoUrl = mediaUrl(logo, 'small')
 
   return (
     <footer className="bg-card border-t border-border pt-20 pb-10 text-text" dir="rtl">

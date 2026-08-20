@@ -5,7 +5,8 @@ import { getBlogPostBySlug } from '@/lib/data/blog'
 import { RichText } from '@/components/RichText/RichText'
 import { ImageGallery } from '@/components/ImageGallery/ImageGallery'
 import { lexicalToPlainText } from '@/lib/lexicalUtils'
-import type { Media, User } from '@/payload-types'
+import type { Media, Person, User } from '@/payload-types'
+import { HERO_VARIANTS, mediaSrcSet, mediaUrl, toGalleryImages } from '@/lib/media'
 
 interface PageProps {
   params: Promise<{
@@ -33,10 +34,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     `${post.title} - مقاله‌ای در مورد سلامت در عصر سلامت`
 
   const ogImage = (post.seo?.ogImage || post.thumbnail) as Media
-  const ogImageUrl = ogImage?.url
-    ? ogImage.url.startsWith('http')
-      ? ogImage.url
-      : `${serverUrl}${ogImage.url}`
+  const ogImagePath = mediaUrl(ogImage, 'og')
+  const ogImageUrl = ogImagePath
+    ? ogImagePath.startsWith('http')
+      ? ogImagePath
+      : `${serverUrl}${ogImagePath}`
     : undefined
 
   const keywords = post.seo?.keywords?.map((k: any) => k.keyword) || []
@@ -69,21 +71,12 @@ export default async function BlogPostPage({ params }: PageProps) {
     notFound()
   }
 
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
   const thumbnail = post.thumbnail as Media
-  const imageUrl = thumbnail?.url
-    ? thumbnail.url.startsWith('http')
-      ? thumbnail.url
-      : `${serverUrl}${thumbnail.url}`
-    : null
+  const imageUrl = mediaUrl(thumbnail, 'hero')
+  const imageSrcSet = mediaSrcSet(thumbnail, HERO_VARIANTS)
 
   const author = post.author as User
-  const authorProfileImage = author?.profileImage as Media
-  const authorImageUrl = authorProfileImage?.url
-    ? authorProfileImage.url.startsWith('http')
-      ? authorProfileImage.url
-      : `${serverUrl}${authorProfileImage.url}`
-    : null
+  const authorImageUrl = mediaUrl(author?.profileImage as Person, 'avatar')
 
   const formattedDate = post.createdAt 
     ? new Date(post.createdAt).toLocaleDateString('fa-IR', {
@@ -104,7 +97,11 @@ export default async function BlogPostPage({ params }: PageProps) {
         {imageUrl && (
           <img
             src={imageUrl}
+            srcSet={imageSrcSet}
+            sizes="100vw"
             alt=""
+            fetchPriority="high"
+            decoding="async"
             className="w-full h-full object-cover"
           />
         )}
@@ -142,19 +139,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                 <span className="w-2 h-8 rounded-full" style={{ backgroundColor: post.themeColor || 'var(--primary)' }} />
                 گالری تصاویر
               </h2>
-              <ImageGallery 
-                images={post.gallery.map(item => {
-                  const media = item.media as Media
-                  return {
-                    url: media?.url
-                      ? media.url.startsWith('http')
-                        ? media.url
-                        : `${serverUrl}${media.url}`
-                      : '',
-                    alt: media?.alt || ''
-                  }
-                }).filter(img => img.url !== '')}
-              />
+              <ImageGallery images={toGalleryImages(post.gallery)} />
             </section>
           )}
         </div>
@@ -168,9 +153,11 @@ export default async function BlogPostPage({ params }: PageProps) {
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center overflow-hidden shrink-0">
                   {authorImageUrl ? (
-                    <img 
-                      src={authorImageUrl} 
-                      alt="" 
+                    <img
+                      src={authorImageUrl}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   ) : (

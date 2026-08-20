@@ -6,6 +6,7 @@ import { RichText } from '@/components/RichText/RichText'
 import { ImageGallery } from '@/components/ImageGallery/ImageGallery'
 import { lexicalToPlainText } from '@/lib/lexicalUtils'
 import type { Media } from '@/payload-types'
+import { HERO_VARIANTS, mediaSrcSet, mediaUrl, toGalleryImages } from '@/lib/media'
 
 interface PageProps {
   params: Promise<{
@@ -33,10 +34,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     `خدمات ${service.title} در مرکز جامع دیالیز و درمانگاه عصر سلامت`
 
   const ogImage = (service.seo?.ogImage || service.image) as Media
-  const ogImageUrl = ogImage?.url
-    ? ogImage.url.startsWith('http')
-      ? ogImage.url
-      : `${serverUrl}${ogImage.url}`
+  const ogImagePath = mediaUrl(ogImage, 'og')
+  const ogImageUrl = ogImagePath
+    ? ogImagePath.startsWith('http')
+      ? ogImagePath
+      : `${serverUrl}${ogImagePath}`
     : undefined
 
   const keywords = service.seo?.keywords?.map((k: any) => k.keyword) || []
@@ -69,13 +71,9 @@ export default async function ServicePage({ params }: PageProps) {
     return notFound()
   }
 
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
   const mainImage = service.image as Media
-  const mainImageUrl = mainImage?.url
-    ? mainImage.url.startsWith('http')
-      ? mainImage.url
-      : `${serverUrl}${mainImage.url}`
-    : null
+  const mainImageUrl = mediaUrl(mainImage, 'hero')
+  const mainImageSrcSet = mediaSrcSet(mainImage, HERO_VARIANTS)
 
   return (
     <article className="pb-24 text-text" dir="rtl">
@@ -84,7 +82,11 @@ export default async function ServicePage({ params }: PageProps) {
         {mainImageUrl && (
           <img
             src={mainImageUrl}
+            srcSet={mainImageSrcSet}
+            sizes="100vw"
             alt=""
+            fetchPriority="high"
+            decoding="async"
             className="w-full h-full object-cover"
           />
         )}
@@ -129,19 +131,7 @@ export default async function ServicePage({ params }: PageProps) {
           {service.gallery && service.gallery.length > 0 && (
             <section>
               <h2 className="text-2xl md:text-3xl font-bold mb-8">گالری تصاویر</h2>
-              <ImageGallery 
-                images={service.gallery.map(item => {
-                  const media = item.media as Media
-                  return {
-                    url: media?.url
-                      ? media.url.startsWith('http')
-                        ? media.url
-                        : `${serverUrl}${media.url}`
-                      : '',
-                    alt: media?.alt || ''
-                  }
-                }).filter(img => img.url !== '')}
-              />
+              <ImageGallery images={toGalleryImages(service.gallery)} />
             </section>
           )}
         </div>

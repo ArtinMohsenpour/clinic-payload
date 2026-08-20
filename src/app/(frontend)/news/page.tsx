@@ -4,6 +4,7 @@ import { getAllNews } from '@/lib/data/news'
 import { SearchFilter } from '@/components/SearchFilter/SearchFilter'
 import { lexicalToPlainText } from '@/lib/lexicalUtils'
 import type { Media } from '@/payload-types'
+import { CARD_VARIANTS, HERO_VARIANTS, mediaSrcSet, mediaUrl } from '@/lib/media'
 
 export const metadata = {
   title: 'اخبار | عصر سلامت',
@@ -33,7 +34,6 @@ export default async function NewsPage({ searchParams }: PageProps) {
   const totalPages = Math.max(1, Math.ceil(allNews.length / ITEMS_PER_PAGE))
   const safePage = Math.min(currentPage, totalPages)
   const news = allNews.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE)
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
 
   return (
     <div className="flex flex-col md:gap-12 pb-12" dir="rtl">
@@ -57,11 +57,9 @@ export default async function NewsPage({ searchParams }: PageProps) {
         <div className="flex flex-col gap-5">
           {news.map((item, index) => {
             const thumbnail = item.thumbnail as Media
-            const imageUrl = thumbnail?.url
-              ? thumbnail.url.startsWith('http')
-                ? thumbnail.url
-                : `${serverUrl}${thumbnail.url}`
-              : null
+            const isFeatured = index === 0
+            const imageUrl = mediaUrl(thumbnail, isFeatured ? 'hero' : 'card')
+            const imageSrcSet = mediaSrcSet(thumbnail, isFeatured ? HERO_VARIANTS : CARD_VARIANTS)
             const excerpt = lexicalToPlainText(item.text).substring(0, 240)
             const href = `/news/${item.slug || item.id}`
             const themeColor = item.themeColor || '#2563eb'
@@ -87,7 +85,11 @@ export default async function NewsPage({ searchParams }: PageProps) {
                     {imageUrl ? (
                       <img
                         src={imageUrl}
+                        srcSet={imageSrcSet}
+                        sizes="100vw"
                         alt=""
+                        fetchPriority="high"
+                        decoding="async"
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                     ) : (
@@ -178,7 +180,11 @@ export default async function NewsPage({ searchParams }: PageProps) {
                     {imageUrl ? (
                       <img
                         src={imageUrl}
+                        srcSet={imageSrcSet}
+                        sizes="(max-width: 768px) 100vw, 400px"
                         alt=""
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                     ) : (
