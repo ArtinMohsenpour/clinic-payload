@@ -4,6 +4,7 @@ import { adminCeoManagerEditor } from '../access/hasRole'
 import { contentImageSizes } from '../lib/upload/imageSizes'
 import { sanitizeFileName } from '../lib/upload/filename'
 import { STORAGE_PREFIX, dateBasedPrefix } from '../lib/upload/prefix'
+import { adminThumbnail } from '../lib/upload/publicUrl'
 
 /**
  * Content photography — news and blog thumbnails, service and branch images,
@@ -42,7 +43,7 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
-    adminThumbnail: 'thumbnail',
+    adminThumbnail: adminThumbnail('media', 'thumbnail'),
     crop: true,
     focalPoint: true,
     imageSizes: contentImageSizes,

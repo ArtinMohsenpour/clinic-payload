@@ -1,3 +1,10 @@
+import type { GetAdminThumbnail } from 'payload'
+
+type UploadedFile = {
+  filename?: null | string
+  url?: null | string
+}
+
 /**
  * Base URL that public assets are served from.
  *
@@ -30,3 +37,31 @@ export const publicFileURL = ({
   const key = [prefix, encodeURIComponent(filename)].filter(Boolean).join('/')
   return `${publicAssetBase()}/${key}`
 }
+
+/**
+ * Admin thumbnail resolver.
+ *
+ * Passing `adminThumbnail: 'small'` makes Payload run the size's stored URL
+ * through `generateFilePathOrURL`, whose "is this external?" test is
+ * `!url.startsWith(config.serverURL)` — and `''.startsWith('')` is true, so an
+ * unset `serverURL` classifies every bucket URL as local and rewrites it to
+ * `/api/<collection>/file/<name>`. That route 500s for collections using
+ * `disablePayloadAccessControl`, because they have no static handler.
+ *
+ * Resolving the URL here skips that branch, so admin previews work whether or
+ * not `serverURL` is configured. Relative URLs are rebuilt from the filename
+ * rather than reused, because a document moved between collections by a
+ * migration still carries the old collection's path in its stored `url`.
+ */
+export const adminThumbnail =
+  (collectionSlug: string, size: string): GetAdminThumbnail =>
+  ({ doc }) => {
+    const sizes = doc?.sizes as Record<string, undefined | UploadedFile> | undefined
+    // SVG and video are never resized — fall back to the original file.
+    const file: undefined | UploadedFile = sizes?.[size]?.filename ? sizes[size] : (doc as UploadedFile)
+
+    if (file?.url && /^https?:\/\//.test(file.url)) return file.url
+    if (file?.filename) return `/api/${collectionSlug}/file/${encodeURIComponent(file.filename)}`
+
+    return null
+  }

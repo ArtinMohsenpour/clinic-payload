@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { adminCeoManager } from '../access/hasRole'
 import { logoImageSizes } from '../lib/upload/imageSizes'
 import { sanitizeFileName } from '../lib/upload/filename'
+import { adminThumbnail } from '../lib/upload/publicUrl'
 
 /**
  * Logos and identity assets — site logo, favicons, insurance company logos.
@@ -41,7 +42,7 @@ export const Brand: CollectionConfig = {
     },
   ],
   upload: {
-    adminThumbnail: 'small',
+    adminThumbnail: adminThumbnail('brand', 'small'),
     crop: false,
     imageSizes: logoImageSizes,
     // SVG is never rasterised by Payload, so this only caps raster logos.

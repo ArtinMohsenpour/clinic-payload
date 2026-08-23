@@ -102,6 +102,13 @@ const documentStorage = s3Storage({
 })
 
 export default buildConfig({
+  /**
+   * Payload defaults `serverURL` to `''`, and several of its URL helpers test
+   * "is this link external?" with `url.startsWith(serverURL)` — which is true
+   * for every string when the prefix is empty. Setting it explicitly keeps
+   * bucket URLs from being rewritten into local `/api/.../file/...` paths.
+   */
+  serverURL: process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL || '',
   admin: {
     user: Users.slug,
     importMap: {
