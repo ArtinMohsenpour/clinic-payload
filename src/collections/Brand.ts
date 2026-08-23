@@ -4,6 +4,7 @@ import { adminCeoManager } from '../access/hasRole'
 import { logoImageSizes } from '../lib/upload/imageSizes'
 import { sanitizeFileName } from '../lib/upload/filename'
 import { adminThumbnail } from '../lib/upload/publicUrl'
+import { immutableCacheHeaders } from '../lib/upload/cacheControl'
 
 /**
  * Logos and identity assets — site logo, favicons, insurance company logos.
@@ -42,6 +43,7 @@ export const Brand: CollectionConfig = {
     },
   ],
   upload: {
+    modifyResponseHeaders: immutableCacheHeaders,
     adminThumbnail: adminThumbnail('brand', 'small'),
     crop: false,
     imageSizes: logoImageSizes,

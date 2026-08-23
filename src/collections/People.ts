@@ -5,6 +5,7 @@ import { portraitImageSizes } from '../lib/upload/imageSizes'
 import { sanitizeFileName } from '../lib/upload/filename'
 import { STORAGE_PREFIX, dateBasedPrefix } from '../lib/upload/prefix'
 import { adminThumbnail } from '../lib/upload/publicUrl'
+import { immutableCacheHeaders } from '../lib/upload/cacheControl'
 
 /**
  * Staff and doctor portraits. Kept separate from content photography because
@@ -41,6 +42,7 @@ export const People: CollectionConfig = {
     },
   ],
   upload: {
+    modifyResponseHeaders: immutableCacheHeaders,
     adminThumbnail: adminThumbnail('people', 'avatar'),
     crop: true,
     focalPoint: true,

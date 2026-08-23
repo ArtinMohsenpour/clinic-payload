@@ -47,14 +47,35 @@ const s3ClientConfig = {
 }
 
 /**
- * Public image collections are served straight from object storage:
- * `disablePayloadAccessControl` makes the stored `url` point at the bucket, so
- * image bytes never travel through the app container.
+ * Liara's object storage refuses browser traffic on the bucket endpoint: a
+ * request for a public object returns the bucket contents for `curl/*`, but a
+ * bare `404 page not found` for any `Mozilla/*`, `Chrome/*`, `Safari/*` or
+ * `Firefox/*` User-Agent. Nothing about the object or its ACL is involved —
+ * the same key, in the same second, succeeds or fails on User-Agent alone.
+ *
+ * So image bytes must travel through the app: Payload registers its S3 static
+ * handler at `/api/<collection>/file/<name>`, fetches from the bucket
+ * server-side, and streams to the browser from our own origin. That handler
+ * already supports ETag/304 and range requests.
+ *
+ * `S3_PUBLIC_URL` remains the opt-in for direct serving, for when a CDN or
+ * custom domain that *does* answer browsers sits in front of the bucket. Do
+ * not point it at `<bucket>.storage.c2.liara.site` — that is the blocked host.
  *
  * `alwaysInsertFields` keeps the `prefix` column in the schema even when S3 is
  * switched off locally, so migrations generated on a dev machine match what
  * production actually runs.
  */
+const serveDirectFromBucket = Boolean(process.env.S3_PUBLIC_URL)
+
+const publicCollection = (prefix: string) => ({
+  prefix,
+  ...(serveDirectFromBucket && {
+    disablePayloadAccessControl: true as const,
+    generateFileURL: publicFileURL,
+  }),
+})
+
 const publicImageStorage = s3Storage({
   acl: 'public-read',
   alwaysInsertFields: true,
@@ -63,21 +84,9 @@ const publicImageStorage = s3Storage({
   config: s3ClientConfig,
   enabled: s3Enabled,
   collections: {
-    media: {
-      prefix: STORAGE_PREFIX.media,
-      disablePayloadAccessControl: true,
-      generateFileURL: publicFileURL,
-    },
-    brand: {
-      prefix: STORAGE_PREFIX.brand,
-      disablePayloadAccessControl: true,
-      generateFileURL: publicFileURL,
-    },
-    people: {
-      prefix: STORAGE_PREFIX.people,
-      disablePayloadAccessControl: true,
-      generateFileURL: publicFileURL,
-    },
+    media: publicCollection(STORAGE_PREFIX.media),
+    brand: publicCollection(STORAGE_PREFIX.brand),
+    people: publicCollection(STORAGE_PREFIX.people),
   },
 })
 

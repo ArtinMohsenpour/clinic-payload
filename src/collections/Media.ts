@@ -5,6 +5,7 @@ import { contentImageSizes } from '../lib/upload/imageSizes'
 import { sanitizeFileName } from '../lib/upload/filename'
 import { STORAGE_PREFIX, dateBasedPrefix } from '../lib/upload/prefix'
 import { adminThumbnail } from '../lib/upload/publicUrl'
+import { immutableCacheHeaders } from '../lib/upload/cacheControl'
 
 /**
  * Content photography — news and blog thumbnails, service and branch images,
@@ -43,6 +44,7 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
+    modifyResponseHeaders: immutableCacheHeaders,
     adminThumbnail: adminThumbnail('media', 'thumbnail'),
     crop: true,
     focalPoint: true,
