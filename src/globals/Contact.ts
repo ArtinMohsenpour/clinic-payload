@@ -39,6 +39,17 @@ export const Contact: GlobalConfig = {
       },
       fields: [
         {
+          // Optional on purpose: existing rows predate this field, and making it
+          // required would block editors from saving the page until every
+          // number already in the database had been given a label.
+          name: 'label',
+          type: 'text',
+          label: 'عنوان (Label)',
+          admin: {
+            description: 'مثال: پذیرش، اورژانس، بخش دیالیز',
+          },
+        },
+        {
           name: 'number',
           type: 'text',
           label: 'شماره (Number)',
@@ -55,6 +66,14 @@ export const Contact: GlobalConfig = {
       name: 'googleMapsLink',
       label: 'لینک گوگل مپ (Google Maps Link)',
     }),
+    {
+      name: 'emailLabel',
+      type: 'text',
+      label: 'عنوان ایمیل (Email Label)',
+      admin: {
+        description: 'مثال: پشتیبانی، امور اداری',
+      },
+    },
     {
       name: 'emailAddress',
       type: 'email',

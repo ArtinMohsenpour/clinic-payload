@@ -123,7 +123,15 @@ export const HighlightCarousel: React.FC<HighlightCarouselProps> = ({
                     </p>
                   )}
 
-                  <span className="mt-auto flex items-center gap-1.5 pt-3 text-xs font-bold text-[color:var(--theme-color)] md:text-sm">
+                  {/*
+                    White rather than the article's themeColor. The colour is
+                    editor-supplied, so it can land anywhere on the wheel — a
+                    dark or low-saturation pick drops this label to single-digit
+                    contrast on the card. White is legible whatever the editor
+                    chooses; the theme colour still shows in the accent rule
+                    under the image, where legibility is not at stake.
+                  */}
+                  <span className="mt-auto flex items-center gap-1.5 pt-3 text-xs font-bold text-text md:text-sm">
                     مشاهده جزئیات
                     <ArrowLeft
                       className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1"

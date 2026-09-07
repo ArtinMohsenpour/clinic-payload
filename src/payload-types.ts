@@ -1643,6 +1643,10 @@ export interface Contact {
   } | null;
   phoneNumbers?:
     | {
+        /**
+         * مثال: پذیرش، اورژانس، بخش دیالیز
+         */
+        label?: string | null;
         number: string;
         id?: string | null;
       }[]
@@ -1654,6 +1658,10 @@ export interface Contact {
     url?: string | null;
     slug?: string | null;
   };
+  /**
+   * مثال: پشتیبانی، امور اداری
+   */
+  emailLabel?: string | null;
   emailAddress?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1947,6 +1955,7 @@ export interface ContactSelect<T extends boolean = true> {
   phoneNumbers?:
     | T
     | {
+        label?: T;
         number?: T;
         id?: T;
       };
@@ -1959,6 +1968,7 @@ export interface ContactSelect<T extends boolean = true> {
         url?: T;
         slug?: T;
       };
+  emailLabel?: T;
   emailAddress?: T;
   updatedAt?: T;
   createdAt?: T;

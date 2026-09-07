@@ -137,7 +137,7 @@ export const Navbar = ({ navbar }: { navbar: NavbarType }) => {
 
           {/* Left side: Logo */}
           <div className="flex items-center shrink-0">
-            <Link href="/" className="flex items-center gap-3">
+            <Link href="/" className="flex items-center">
               {/*
                 Desktop wordmark, part of the same home link as the logo so the
                 pair reads as one brand lockup rather than two targets. It comes
