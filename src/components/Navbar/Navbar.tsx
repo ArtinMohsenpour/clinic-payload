@@ -24,128 +24,189 @@ export const Navbar = ({ navbar }: { navbar: NavbarType }) => {
   }, [])
 
   return (
-    <header 
-      className={`flex sticky top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out py-5 ${
-        scrolled ? 'bg-background/95 backdrop-blur-md py-3 shadow-lg' : 'bg-transparent'
-      }`}
-    >
-      <nav className="container text-text flex items-center justify-between">
-        {/* Navigation Items (Justified Right) */}
-        <div className="hidden lg:flex items-center">
-          <ul className="flex items-center gap-12 list-none p-0 m-0">
-            {navbar.navItems?.map((item) => {
-              const { id, type } = item
+    <>
+      <header 
+        className={`flex sticky top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out py-5 ${
+          scrolled ? 'bg-background/95 backdrop-blur-md py-3 shadow-lg' : 'bg-transparent'
+        }`}
+      >
+        <nav className="container text-text flex items-center justify-between relative">
+          {/* Navigation Items (Justified Right) */}
+          <div className="hidden lg:flex items-center">
+            <ul className="flex items-center gap-12 list-none p-0 m-0">
+              {navbar.navItems?.map((item) => {
+                const { id, type } = item
 
-              if (type === 'dropdown') {
-                const isChildActive = item.dropdownItems?.some((dropdownItem) => {
-                  const { link: subLink } = dropdownItem
-                  const subHref = subLink.type === 'reference' ? `/${subLink.slug}` : subLink.url || '#'
-                  return pathname === subHref
-                })
+                if (type === 'dropdown') {
+                  const isChildActive = item.dropdownItems?.some((dropdownItem) => {
+                    const { link: subLink } = dropdownItem
+                    const subHref = subLink.type === 'reference' ? `/${subLink.slug}` : subLink.url || '#'
+                    return pathname === subHref
+                  })
 
-                return (
-                  <li key={id} className="relative group">
-                    <button className={`text-base font-medium transition-colors duration-200 flex items-center gap-1 cursor-pointer ${
-                      isChildActive ? 'text-primary' : 'hover:text-secondary/80'
-                    }`}>
-                      {item.dropdownLabel}
-                      <svg
-                        className="w-4 h-4 transition-transform duration-200 group-hover:rotate-180"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+                  return (
+                    <li key={id} className="relative group">
+                      <button className={`text-base font-medium transition-colors duration-200 flex items-center gap-1 cursor-pointer ${
+                        isChildActive ? 'text-primary' : 'hover:text-secondary/80'
+                      }`}>
+                        {item.dropdownLabel}
+                        <svg
+                          className="w-4 h-4 transition-transform duration-200 group-hover:rotate-180"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      <div className="absolute right-0 top-full pt-4 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-50">
+                        <ul className="bg-card/95 backdrop-blur-md border border-border rounded-xl py-3 min-w-[200px] shadow-2xl list-none p-0 m-0 overflow-hidden">
+                          {item.dropdownItems?.map((dropdownItem) => {
+                            const { link: subLink, id: subId } = dropdownItem
+                            const subHref =
+                              subLink.type === 'reference' ? `/${subLink.slug}` : subLink.url || '#'
+                            const isActive = pathname === subHref
+
+                            return (
+                              <li key={subId}>
+                                <Link
+                                  href={subHref}
+                                  className={`block px-6 py-2.5 text-sm transition-colors duration-200 whitespace-nowrap text-right ${
+                                    isActive 
+                                      ? 'bg-primary text-white' 
+                                      : 'hover:bg-primary hover:text-text'
+                                  }`}
+                                >
+                                  {subLink.label}
+                                </Link>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      </div>
+                    </li>
+                  )
+                }
+
+                if (item.link) {
+                  const { link } = item
+                  const href = link.type === 'reference' ? `/${link.slug}` : link.url || '#'
+                  const isActive = pathname === href
+
+                  return (
+                    <li key={id}>
+                      <Link
+                        href={href}
+                        className={`text-base font-medium transition-colors duration-200 relative group ${
+                          isActive ? 'text-primary' : 'hover:text-secondary/80'
+                        }`}
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                    <div className="absolute right-0 top-full pt-4 opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-50">
-                      <ul className="bg-card/95 backdrop-blur-md border border-border rounded-xl py-3 min-w-[200px] shadow-2xl list-none p-0 m-0 overflow-hidden">
-                        {item.dropdownItems?.map((dropdownItem) => {
-                          const { link: subLink, id: subId } = dropdownItem
-                          const subHref =
-                            subLink.type === 'reference' ? `/${subLink.slug}` : subLink.url || '#'
-                          const isActive = pathname === subHref
+                        {link.label}
+                        <span className={`absolute -bottom-1 right-0 h-0.5 bg-primary transition-all duration-300 ${
+                          isActive ? 'w-full' : 'w-0 group-hover:w-full'
+                        }`}></span>
+                      </Link>
+                    </li>
+                  )
+                }
 
-                          return (
-                            <li key={subId}>
-                              <Link
-                                href={subHref}
-                                className={`block px-6 py-2.5 text-sm transition-colors duration-200 whitespace-nowrap text-right ${
-                                  isActive 
-                                    ? 'bg-primary text-white' 
-                                    : 'hover:bg-primary hover:text-text'
-                                }`}
-                              >
-                                {subLink.label}
-                              </Link>
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    </div>
-                  </li>
-                )
-              }
+                return null
+              })}
+            </ul>
+          </div>
 
-              if (item.link) {
-                const { link } = item
-                const href = link.type === 'reference' ? `/${link.slug}` : link.url || '#'
-                const isActive = pathname === href
+          {/*
+            Company name, centred on mobile only.
 
-                return (
-                  <li key={id}>
-                    <Link
-                      href={href}
-                      className={`text-base font-medium transition-colors duration-200 relative group ${
-                        isActive ? 'text-primary' : 'hover:text-secondary/80'
-                      }`}
-                    >
-                      {link.label}
-                      <span className={`absolute -bottom-1 right-0 h-0.5 bg-primary transition-all duration-300 ${
-                        isActive ? 'w-full' : 'w-0 group-hover:w-full'
-                      }`}></span>
-                    </Link>
-                  </li>
-                )
-              }
-
-              return null
-            })}
-          </ul>
-        </div>
-
-        {/* Left side: Logo */}
-        <div className="flex items-center shrink-0">
-          <Link href="/" className="flex items-center w-fit h-auto min-w-[120px] inline-block">
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt={logo.alt || 'Logo'}
-                width={logo.width || 180}
-                height={logo.height || 60}
-                className="object-contain h-12 w-auto transition-transform duration-300 hover:scale-105"
-                style={{ width: 'auto', height: '48px', display: 'block' }}
-                loading="eager"
-              />
-            ) : (
-              <span className="text-2xl font-bold tracking-tight">LOGO</span>
-            )}
-          </Link>
-        </div>
-
-        {/* Mobile Menu Toggle */}
-        <div className="lg:hidden">
-          <button 
-            onClick={() => setIsOpen(true)}
-            className="text-text p-2 focus:outline-none hover:bg-white/10 rounded-lg transition-colors"
+            Absolutely centred against the nav rather than placed as a flex
+            item: the logo (89px) and the toggle (50px) are different widths, so
+            a flex-distributed element would sit ~20px off true centre. Capped
+            at 40% of the bar and clipped so a longer name can never collide
+            with either end, and `pointer-events-none` keeps it from swallowing
+            taps meant for the logo or the menu button. It is plain text, not a
+            second link to "/", which would duplicate the logo's target — but it
+            is NOT aria-hidden: the logo's alt text is the asset's own alt (e.g.
+            "main-logo"), not the clinic's name, so this is the only place a
+            screen reader hears it.
+          */}
+          <span
+            className="lg:hidden pointer-events-none absolute left-1/2 -translate-x-1/2 max-w-[40%] truncate text-center text-lg font-bold tracking-tight text-text"
           >
-            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
-            </svg>
-          </button>
-        </div>
-      </nav>
+            عصر سلامت
+          </span>
 
+          {/* Left side: Logo */}
+          <div className="flex items-center shrink-0">
+            <Link href="/" className="flex items-center gap-3">
+              {/*
+                Desktop wordmark, part of the same home link as the logo so the
+                pair reads as one brand lockup rather than two targets. It comes
+                FIRST in DOM order because the row is RTL: the first flex item
+                sits at the right, which places the name to the right of the
+                logo — outward into the free space, not off the left edge. On
+                mobile it is hidden and the centred span in the bar takes over.
+              */}
+              <span className="hidden lg:inline whitespace-nowrap text-xl font-bold tracking-tight text-text">
+                عصر سلامت
+              </span>
+              {logoUrl ? (
+                <img
+                  src={logoUrl}
+                  alt={logo.alt || 'Logo'}
+                  width={logo.width || 180}
+                  height={logo.height || 60}
+                  /*
+                    The height stays definite. `w-auto` on a replaced element
+                    inside a shrink-to-fit flex parent collapses to 0 unless one
+                    axis is pinned, so swapping the height for `max-h-*` makes
+                    the logo vanish entirely.
+
+                    `max-w` then caps how far it can reach toward the centred
+                    clinic name: 28vw tracks small screens (90px at 320, 105px
+                    at 375) and the 116px ceiling covers larger phones. When the
+                    cap bites, `object-contain` scales the artwork down inside
+                    the box — the leftover space is vertical, so the logo still
+                    sits flush against the left edge. Desktop is uncapped.
+                  */
+                  className="object-contain h-12 w-auto max-w-[min(116px,28vw)] lg:max-w-none transition-transform duration-300 hover:scale-105"
+                  style={{ width: 'auto', height: '48px', display: 'block' }}
+                  loading="eager"
+                />
+              ) : (
+                <span className="text-2xl font-bold tracking-tight">LOGO</span>
+              )}
+            </Link>
+          </div>
+
+          {/*
+            Mobile menu toggle. `order-first` puts it at the RTL start — the
+            right edge — leaving the logo at the left. Ordering only, so the DOM
+            keeps logo-before-toggle for screen readers and keyboard order.
+          */}
+          <div className="lg:hidden order-first">
+            <button 
+              onClick={() => setIsOpen(true)}
+              className="text-text p-2 focus:outline-none hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+              </svg>
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      {/*
+        Mobile menu overlay — deliberately a SIBLING of <header>, not a child.
+
+        Once scrolled, the header gets `backdrop-blur-md`, and an element with a
+        backdrop-filter becomes the containing block for its `position: fixed`
+        descendants. Nested inside, this overlay resolved `inset-0` against the
+        header instead of the viewport: it collapsed to header height (96px on a
+        375x812 screen) so only the drawer's title bar rendered and the page
+        showed through underneath. Reloading appeared to "fix" it only because
+        that returns to scrollY 0, where the header has no backdrop-filter.
+      */}
       {/* Mobile Menu Overlay */}
       <div 
         className={`fixed inset-0 z-[60] lg:hidden transition-all duration-300 ${
@@ -160,7 +221,7 @@ export const Navbar = ({ navbar }: { navbar: NavbarType }) => {
         
         {/* Drawer */}
         <div 
-          className={`absolute top-0 right-0 h-full w-[300px] bg-card/98 backdrop-blur-xl border-l border-white/10 shadow-2xl transition-transform duration-500 ease-out ${
+          className={`absolute top-0 right-0 h-full w-[300px] bg-card border-l border-white/10 shadow-2xl transition-transform duration-500 ease-out ${
             isOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
           dir="rtl"
@@ -277,6 +338,6 @@ export const Navbar = ({ navbar }: { navbar: NavbarType }) => {
           </div>
         </div>
       </div>
-    </header>
+    </>
   )
 }

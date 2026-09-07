@@ -4,9 +4,9 @@ import React from 'react'
 import Link from 'next/link'
 import { Carousel } from '../Carousel/Carousel'
 import type { Media } from '@/payload-types'
-import { CARD_VARIANTS, mediaSrcSet, mediaUrl } from '@/lib/media'
-import { RichText } from '@/components/RichText/RichText'
-import { ArrowLeft } from 'lucide-react'
+import { CARD_VARIANTS, mediaAlt, mediaSrcSet, mediaUrl } from '@/lib/media'
+import { lexicalToPlainText } from '@/lib/lexicalUtils'
+import { ArrowLeft, CalendarDays } from 'lucide-react'
 
 interface HighlightCarouselProps {
   title: string
@@ -15,13 +15,33 @@ interface HighlightCarouselProps {
   viewAllLink?: string
 }
 
-export const HighlightCarousel: React.FC<HighlightCarouselProps> = ({ 
-  title, 
-  items, 
-  linkPrefix,
-  viewAllLink 
-}) => {
+const EXCERPT_LENGTH = 160
 
+/**
+ * Short teaser for the card body.
+ *
+ * `blog` has no dedicated summary field, so the excerpt comes from the article
+ * body. Trimming on a word boundary avoids cutting a Persian word in half; the
+ * clamp is a character budget rather than a line count so the text is already
+ * short before CSS clamps it.
+ */
+const toExcerpt = (item: any): string => {
+  const raw = lexicalToPlainText(item.text).replace(/\s+/g, ' ').trim()
+  if (!raw) return ''
+  if (raw.length <= EXCERPT_LENGTH) return raw
+
+  const cut = raw.slice(0, EXCERPT_LENGTH)
+  const lastSpace = cut.lastIndexOf(' ')
+
+  return `${(lastSpace > EXCERPT_LENGTH * 0.6 ? cut.slice(0, lastSpace) : cut).trim()}…`
+}
+
+export const HighlightCarousel: React.FC<HighlightCarouselProps> = ({
+  title,
+  items,
+  linkPrefix,
+  viewAllLink,
+}) => {
   return (
     <div className="w-full">
       <Carousel
@@ -32,89 +52,87 @@ export const HighlightCarousel: React.FC<HighlightCarouselProps> = ({
         viewAllText="بیشتر"
         renderItem={(item: any) => {
           const image = item.thumbnail as Media
-          const imageUrl = mediaUrl(image, 'feature')
+          const imageUrl = mediaUrl(image, 'card')
           const imageSrcSet = mediaSrcSet(image, CARD_VARIANTS)
-
+          const excerpt = toExcerpt(item)
           const themeColor = item.themeColor || '#E91E63'
 
           return (
-            <div
-              className="group relative w-[280px] md:w-[450px] lg:w-[540px] aspect-[16/10] rounded-xl overflow-hidden bg-[#1E2135] border border-white/5 transition-all duration-300 hover:border-white/20 shadow-xl"
-              style={
-                {
-                  '--theme-color': themeColor,
-                } as React.CSSProperties
-              }
+            <article
+              className="group h-full w-[280px] sm:w-[320px] lg:w-[360px]"
+              style={{ '--theme-color': themeColor } as React.CSSProperties}
             >
-              {/* Image with Dark Overlay */}
-              <div className="absolute inset-0 z-0">
-                {imageUrl && (
-                  <img
-                    src={imageUrl}
-                    srcSet={imageSrcSet}
-                    sizes="(max-width: 768px) 280px, (max-width: 1024px) 450px, 540px"
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                )}
-                {/* Gradient Overlay for better text visibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-dark via-dark/70 to-transparent opacity-90" />
+              {/*
+                The whole card is one link: a single crawlable target per
+                article, and the entire surface is clickable rather than just a
+                button. Nothing inside may be an <a>.
+              */}
+              <Link
+                href={`/${linkPrefix}/${item.slug || item.id}`}
+                className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--theme-color)]"
+              >
+                <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-background">
+                  {imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      srcSet={imageSrcSet}
+                      sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 360px"
+                      alt={mediaAlt(image, item.title)}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <span className="text-sm text-text/20">فاقد تصویر</span>
+                    </div>
+                  )}
 
-                {/* Decorative background patterns (inspired by the design) */}
-                <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20 transition-opacity duration-500 group-hover:opacity-40">
-                  <div
-                    className="absolute -top-10 -right-10 w-40 h-40 rounded-full blur-3xl"
-                    style={{ backgroundColor: themeColor }}
-                  />
-                  <div
-                    className="absolute bottom-10 left-10 w-32 h-32 rounded-full blur-3xl opacity-50"
-                    style={{ backgroundColor: themeColor }}
+                  {/* Accent rule that sweeps in from the right (RTL start). */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-0 bottom-0 h-[3px] origin-right scale-x-0 bg-[color:var(--theme-color)] transition-transform duration-500 ease-out group-hover:scale-x-100"
                   />
                 </div>
-              </div>
 
-              {/* Content Container */}
-              <div className="relative z-10 h-full flex flex-col justify-end p-4 md:p-8">
-                {/* Bottom Section: Title, Description, and Button */}
-                <div className="flex flex-col gap-3 md:gap-4">
-                  <div className="flex flex-col gap-1 md:gap-2">
-                    <h3 className="text-lg md:text-2xl max-w-fit lg:text-3xl font-bold text-white line-clamp-2 transition-colors group-hover:[text-shadow:0_0_15px_var(--theme-color)] bg-dark/20 backdrop-blur-[3px] bg-dark/20 rounded-lg px-2 -mx-2">
-                      {item.title}
-                    </h3>
-                    {/* Meta Info: Date, Source, Author */}
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                      {item.createdAt && (
-                        <p className="inline-flex items-center justify-center bg-black/20 backdrop-blur-md px-3 pt-[6px] rounded-full text-[10px] md:text-xs text-white border border-white/10 transition-colors hover:bg-white/20 leading-none">
-                          {new Date(item.createdAt).toLocaleDateString('fa-IR')}
-                        </p>
-                      )}
-                      {item.source && (
-                        <p className="inline-flex items-center justify-center bg-black/20 backdrop-blur-md px-3 pt-[6px] rounded-full text-[10px] md:text-xs text-white border border-white/10 transition-colors hover:bg-white/20 leading-none">
-                          {item.source}
-                        </p>
-                      )}
-                    </div>
-
-                    {item.description && (
-                      <div className="text-white/80 text-xs md:text-sm line-clamp-2 mt-2 bg-dark/20 backdrop-blur-[2px] rounded-lg px-2 -mx-2 py-1">
-                        <RichText content={item.description} className="!p-0 !m-0 !text-inherit" />
-                      </div>
+                <div className="flex flex-1 flex-col gap-2 p-4 md:p-5">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-text-muted md:text-xs">
+                    {item.createdAt && (
+                      <time
+                        dateTime={new Date(item.createdAt).toISOString()}
+                        className="inline-flex items-center gap-1.5 leading-none"
+                      >
+                        <CalendarDays className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                        {new Date(item.createdAt).toLocaleDateString('fa-IR')}
+                      </time>
+                    )}
+                    {item.source && (
+                      <span className="inline-flex items-center leading-none before:ms-3 before:me-3 before:text-text-muted/40 before:content-['·']">
+                        {item.source}
+                      </span>
                     )}
                   </div>
 
-                  {/* Action Button */}
-                  <Link
-                    href={`/${linkPrefix}/${item.slug || item.id}`}
-                    className="flex items-center justify-center gap-2 px-4 md:px-6 py-2 md:py-2.5 rounded-lg bg-[color:var(--theme-color)] hover:brightness-110 active:scale-95 text-white text-[10px] md:text-sm font-bold w-fit mt-1 md:mt-2 transition-all duration-300 shadow-[0_4px_15px_rgba(0,0,0,0.3)] hover:shadow-[0_0_20px_var(--theme-color)]"
-                  >
-                    <span>مشاهده جزئیات</span>
-                    <ArrowLeft className="w-4 h-4" />
-                  </Link>
+                  <h3 className="line-clamp-2 text-base font-bold leading-snug text-text transition-colors duration-300 group-hover:[color:var(--theme-color)] md:text-lg">
+                    {item.title}
+                  </h3>
+
+                  {excerpt && (
+                    <p className="line-clamp-3 text-xs leading-relaxed text-text-muted md:text-sm">
+                      {excerpt}
+                    </p>
+                  )}
+
+                  <span className="mt-auto flex items-center gap-1.5 pt-3 text-xs font-bold text-[color:var(--theme-color)] md:text-sm">
+                    مشاهده جزئیات
+                    <ArrowLeft
+                      className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1"
+                      aria-hidden="true"
+                    />
+                  </span>
                 </div>
-              </div>
-            </div>
+              </Link>
+            </article>
           )
         }}
       />
