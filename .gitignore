@@ -40,7 +40,11 @@ next-env.d.ts
 
 .env
 
+# Local upload storage (used only when S3_BUCKET is unset)
 /media
+/brand
+/people
+/documents
 
 # Playwright
 node_modules/
