@@ -20,7 +20,7 @@ export default async function ServicesPage() {
         </h1>
         <div className="w-24 h-1.5 bg-primary mx-auto rounded-full"></div>
         <p className="text-text-muted max-w-2xl mx-auto text-lg">
-          ما در مرکز عصر سلامت با بهره‌گیری از تکنولوژی‌های روز دنیا و کادر مجرب، طیف وسیعی از خدمات تخصصی را به شما عزیزان ارائه می‌دهیم.
+          ما در مرکز عصر سلامت با بهره‌گیری از تکنولوژی‌های روز دنیا و همچنین کادر مجرب، طیف وسیعی از خدمات تخصصی را به شما عزیزان ارائه می‌دهیم.
         </p>
       </div>
 
