@@ -2,12 +2,10 @@
 
 import React, { useState, useEffect } from 'react'
 import { X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react'
+import type { GalleryImage } from '@/lib/media'
 
 interface ImageGalleryProps {
-  images: {
-    url: string
-    alt?: string
-  }[]
+  images: GalleryImage[]
   gridClassName?: string
 }
 
@@ -55,8 +53,12 @@ export function ImageGallery({ images, gridClassName = "grid grid-cols-1 md:grid
             onClick={() => setSelectedIndex(index)}
           >
             <img
-              src={image.url}
+              src={image.thumbUrl || image.url}
+              srcSet={image.thumbSrcSet}
+              sizes="(max-width: 768px) 100vw, 50vw"
               alt=""
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">

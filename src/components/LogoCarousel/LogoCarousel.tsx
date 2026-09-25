@@ -2,7 +2,8 @@
 
 import React from 'react'
 import { Carousel } from '../Carousel/Carousel'
-import type { Media, Insurance } from '@/payload-types'
+import type { Brand, Insurance } from '@/payload-types'
+import { mediaUrl } from '@/lib/media'
 
 interface LogoCarouselProps {
   title: string
@@ -10,7 +11,6 @@ interface LogoCarouselProps {
 }
 
 export const LogoCarousel: React.FC<LogoCarouselProps> = ({ title, items }) => {
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
 
   return (
     <div className="w-full">
@@ -21,12 +21,8 @@ export const LogoCarousel: React.FC<LogoCarouselProps> = ({ title, items }) => {
         viewAllLink="/insurances"
         viewAllText="مشاهده همه"
         renderItem={(item: Insurance) => {
-          const logo = item.logo as Media
-          const imageUrl = logo?.url
-            ? logo.url.startsWith('http')
-              ? logo.url
-              : `${serverUrl}${logo.url}`
-            : null
+          const logo = item.logo as Brand
+          const imageUrl = mediaUrl(logo, 'small')
 
           return (
             <div className="flex flex-col items-center gap-3 w-[160px] md:w-[200px] group">
@@ -35,6 +31,8 @@ export const LogoCarousel: React.FC<LogoCarouselProps> = ({ title, items }) => {
                   <img
                     src={imageUrl}
                     alt={item.title}
+                    loading="lazy"
+                    decoding="async"
                     className="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-110"
                   />
                 )}

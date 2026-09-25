@@ -4,6 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { Carousel } from '../Carousel/Carousel'
 import type { Service, Media } from '@/payload-types'
+import { CARD_VARIANTS, mediaAlt, mediaSrcSet, mediaUrl } from '@/lib/media'
 import { RichText } from '@/components/RichText/RichText'
 
 interface CollectionCarouselProps {
@@ -13,7 +14,6 @@ interface CollectionCarouselProps {
 }
 
 export const CollectionCarousel: React.FC<CollectionCarouselProps> = ({ title, items, linkPrefix }) => {
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
 
   return (
     <div className="w-full ">
@@ -24,12 +24,9 @@ export const CollectionCarousel: React.FC<CollectionCarouselProps> = ({ title, i
         viewAllLink={`/${linkPrefix}`}
         viewAllText="مشاهده همه"
         renderItem={(item: any) => {
-          const image = item.image || item.thumbnail as Media
-          const imageUrl = image?.url
-            ? image.url.startsWith('http')
-              ? image.url
-              : `${serverUrl}${image.url}`
-            : null
+          const image = (item.image || item.thumbnail) as Media
+          const imageUrl = mediaUrl(image, 'card')
+          const imageSrcSet = mediaSrcSet(image, CARD_VARIANTS)
 
           return (
             <Link
@@ -45,29 +42,44 @@ export const CollectionCarousel: React.FC<CollectionCarouselProps> = ({ title, i
                 {imageUrl && (
                   <img
                     src={imageUrl}
-                    alt=""
+                    srcSet={imageSrcSet}
+                    sizes="(max-width: 768px) 280px, 320px"
+                    alt={mediaAlt(image, item.title)}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 )}
 
-                {/* Default Dark Overlay for readability */}
-                <div className="absolute inset-0 bg-black/40 transition-opacity duration-300"></div>
+                {/*
+                  Scrim behind the title. Photographs vary wildly in brightness,
+                  so the title cannot rely on the image alone for contrast; the
+                  scrim deepens on hover so the zooming image never creeps up
+                  behind the text.
+                */}
+                <div className="absolute inset-0 bg-black/55 transition-colors duration-300 group-hover:bg-black/65"></div>
 
-                {/* Content Overlay (Date/Location placeholder as in image) */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-2 z-10">
-                  <div 
-                    className="text-white font-bold text-lg md:text-xl drop-shadow-[0_4px_4px_rgba(0,0,0,1)] transition-all duration-200"
-                    style={{ color: 'inherit' }}
-                  >
-                    <span className="group-hover:[color:var(--theme-color)] group-hover:[text-shadow:0_0_10px_var(--theme-color)] transition-all duration-300">
-                      {item.title}
-                    </span>
-                  </div>
+                {/* Service name, centred over the image */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 z-10">
+                  {/*
+                    The title stays white in every state. Tinting it with the
+                    theme colour on hover dropped it to roughly 3:1 against the
+                    darkened image — the accent is carried by a glow behind the
+                    glyphs instead, which costs no legibility.
+                  */}
+                  <h3 className="text-white font-bold text-lg md:text-xl [text-shadow:0_2px_6px_rgba(0,0,0,0.95)] transition-[text-shadow] duration-300 group-hover:[text-shadow:0_2px_6px_rgba(0,0,0,0.95),0_0_18px_var(--theme-color)]">
+                    {item.title}
+                  </h3>
                 </div>
               </div>
               {/* Text Content Below */}
               <div className="mt-4 px-1 text-right">
-                <div className="text-white/50 text-xs md:text-sm mt-2 line-clamp-2 transition-colors duration-300 group-hover:[color:var(--theme-color)]">
+                {/*
+                  Bright at rest, not on hover. Text that only becomes readable
+                  once you point at it is unreadable for anyone scanning the row,
+                  and on touch there is no hover state at all.
+                */}
+                <div className="text-text text-xs md:text-sm mt-2 line-clamp-2">
                   <RichText content={item.description || item.text} disableLinks={true} />
                 </div>
               </div>

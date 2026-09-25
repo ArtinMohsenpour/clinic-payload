@@ -55,8 +55,13 @@ export default async function ContactPage() {
                     href={`tel:${item.number}`}
                     className="flex items-center justify-between p-3 md:p-4 rounded-md bg-white/5 border border-white/5 hover:bg-primary/10 hover:border-primary/20 transition-all group/item"
                   >
-                    <span className="text-lg md:text-xl font-medium text-white/90 group-hover/item:text-white transition-colors">
-                      {item.number}
+                    <span className="flex min-w-0 flex-col gap-0.5">
+                      {item.label && (
+                        <span className="text-xs md:text-sm text-text-muted">{item.label}</span>
+                      )}
+                      <span className="text-lg md:text-xl font-medium text-white/90 group-hover/item:text-white transition-colors">
+                        {item.number}
+                      </span>
                     </span>
                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/5 flex items-center justify-center group-hover/item:bg-primary group-hover/item:text-white transition-all">
                       <Phone className="w-3.5 h-3.5 md:w-4 md:h-4" />
@@ -82,8 +87,13 @@ export default async function ContactPage() {
                 href={`mailto:${contact.emailAddress}`}
                 className="flex items-center justify-between p-3 md:p-4 rounded-md bg-white/5 border border-white/5 hover:bg-secondary/10 hover:border-secondary/20 transition-all group/item"
               >
-                <span className="text-base md:text-lg font-medium text-white/90 group-hover/item:text-white transition-colors truncate ml-2">
-                  {contact.emailAddress}
+                <span className="flex min-w-0 flex-col gap-0.5 ml-2">
+                  {contact.emailLabel && (
+                    <span className="text-xs md:text-sm text-text-muted">{contact.emailLabel}</span>
+                  )}
+                  <span className="text-base md:text-lg font-medium text-white/90 group-hover/item:text-white transition-colors truncate">
+                    {contact.emailAddress}
+                  </span>
                 </span>
                 <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/5 flex items-center justify-center group-hover/item:bg-secondary group-hover/item:text-white transition-all shrink-0">
                   <Mail className="w-3.5 h-3.5 md:w-4 md:h-4" />

@@ -83,7 +83,7 @@ export const Users: CollectionConfig = {
     {
       name: 'profileImage',
       type: 'upload',
-      relationTo: 'media',
+      relationTo: 'people',
       label: 'تصویر پروفایل (Profile Image)',
     },
     {

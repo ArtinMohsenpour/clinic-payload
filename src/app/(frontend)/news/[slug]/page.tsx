@@ -6,7 +6,8 @@ import { getNewsBySlug } from '@/lib/data/news'
 import { RichText } from '@/components/RichText/RichText'
 import { ImageGallery } from '@/components/ImageGallery/ImageGallery'
 import { lexicalToPlainText } from '@/lib/lexicalUtils'
-import type { Media, User } from '@/payload-types'
+import type { Media, Person, User } from '@/payload-types'
+import { HERO_VARIANTS, mediaSrcSet, mediaUrl, toGalleryImages } from '@/lib/media'
 
 interface PageProps {
   params: Promise<{
@@ -28,10 +29,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     lexicalToPlainText(news.text).substring(0, 160) || `${news.title} - خبر از عصر سلامت`
 
   const thumbnail = news.thumbnail as Media
-  const ogImageUrl = thumbnail?.url
-    ? thumbnail.url.startsWith('http')
-      ? thumbnail.url
-      : `${serverUrl}${thumbnail.url}`
+  const ogImagePath = mediaUrl(thumbnail, 'og')
+  const ogImageUrl = ogImagePath
+    ? ogImagePath.startsWith('http')
+      ? ogImagePath
+      : `${serverUrl}${ogImagePath}`
     : undefined
 
   return {
@@ -60,21 +62,12 @@ export default async function NewsDetailPage({ params }: PageProps) {
     notFound()
   }
 
-  const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
   const thumbnail = news.thumbnail as Media
-  const imageUrl = thumbnail?.url
-    ? thumbnail.url.startsWith('http')
-      ? thumbnail.url
-      : `${serverUrl}${thumbnail.url}`
-    : null
+  const imageUrl = mediaUrl(thumbnail, 'hero')
+  const imageSrcSet = mediaSrcSet(thumbnail, HERO_VARIANTS)
 
   const author = news.author as User
-  const authorProfileImage = author?.profileImage as Media
-  const authorImageUrl = authorProfileImage?.url
-    ? authorProfileImage.url.startsWith('http')
-      ? authorProfileImage.url
-      : `${serverUrl}${authorProfileImage.url}`
-    : null
+  const authorImageUrl = mediaUrl(author?.profileImage as Person, 'avatar')
 
   const formattedDate = news.createdAt
     ? new Date(news.createdAt).toLocaleDateString('fa-IR', {
@@ -93,7 +86,15 @@ export default async function NewsDetailPage({ params }: PageProps) {
       {/* Hero Section */}
       <header className="relative h-[40vh] md:h-[60vh] w-full overflow-hidden">
         {imageUrl && (
-          <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+          <img
+            src={imageUrl}
+            srcSet={imageSrcSet}
+            sizes="100vw"
+            alt=""
+            fetchPriority="high"
+            decoding="async"
+            className="w-full h-full object-cover"
+          />
         )}
         <div className="absolute inset-0 bg-linear-to-t from-background via-background/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 container mx-auto px-4 md:px-8 pb-12">
@@ -135,21 +136,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
                 />
                 گالری تصاویر
               </h2>
-              <ImageGallery
-                images={news.gallery
-                  .map((item) => {
-                    const media = item.media as Media
-                    return {
-                      url: media?.url
-                        ? media.url.startsWith('http')
-                          ? media.url
-                          : `${serverUrl}${media.url}`
-                        : '',
-                      alt: media?.alt || '',
-                    }
-                  })
-                  .filter((img) => img.url !== '')}
-              />
+              <ImageGallery images={toGalleryImages(news.gallery)} />
             </section>
           )}
         </div>
@@ -165,7 +152,13 @@ export default async function NewsDetailPage({ params }: PageProps) {
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center overflow-hidden shrink-0">
                   {authorImageUrl ? (
-                    <img src={authorImageUrl} alt="" className="w-full h-full object-cover" />
+                    <img
+                      src={authorImageUrl}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <span className="text-2xl text-primary font-bold">
                       {author.fullName?.charAt(0) || 'A'}

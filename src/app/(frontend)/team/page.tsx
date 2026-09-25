@@ -1,8 +1,8 @@
 import React from 'react'
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import { getTeamMembers } from '@/lib/data/team'
-import type { Media, Branch, User } from '@/payload-types'
+import type { Branch, Person, User } from '@/payload-types'
+import { PORTRAIT_VARIANTS, mediaSrcSet, mediaUrl } from '@/lib/media'
 
 export const metadata: Metadata = {
   title: 'تیم ما',
@@ -31,7 +31,7 @@ export default async function TeamPage() {
 }
 
 function TeamMemberCard({ member }: { member: User }) {
-  const profileImage = member.profileImage as Media
+  const profileImage = member.profileImage as Person
   const branch = member.branch as Branch
   
   // Role labels in Persian
@@ -51,12 +51,14 @@ function TeamMemberCard({ member }: { member: User }) {
   return (
     <div className="group relative aspect-square overflow-hidden bg-muted">
       {profileImage?.url ? (
-        <Image
-          src={profileImage.url}
-          alt={member.fullName || ''}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
+        <img
+          src={mediaUrl(profileImage, 'card') || ''}
+          srcSet={mediaSrcSet(profileImage, PORTRAIT_VARIANTS)}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, (max-width: 1536px) 25vw, 20vw"
+          alt={member.fullName || ''}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
       ) : (
         <div className="flex items-center justify-center w-full h-full text-text/20">

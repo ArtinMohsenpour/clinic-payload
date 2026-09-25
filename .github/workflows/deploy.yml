@@ -1,0 +1,46 @@
+name: Deploy to Liara
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never let two deploys race each other onto the same app.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # No pnpm-lock.yaml is committed, so this cannot use --frozen-lockfile and
+      # dependency caching is unavailable. Committing a lockfile would make both
+      # possible and make builds reproducible.
+      - run: pnpm install
+
+      # Schema changes must land before the new code that depends on them.
+      # Payload migrations are additive and idempotent — already-applied ones
+      # are skipped, so re-running this on every push is safe.
+      - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
+        run: pnpm migrate
+
+      - name: Deploy
+        env:
+          LIARA_TOKEN: ${{ secrets.LIARA_API_TOKEN }}
+        run: |
+          npm i -g @liara/cli@9
+          liara deploy --app="${{ vars.LIARA_APP }}" --api-token="$LIARA_TOKEN" --no-app-logs

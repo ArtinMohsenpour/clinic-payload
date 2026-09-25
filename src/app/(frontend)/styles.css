@@ -53,6 +53,13 @@
   src: url("/fonts/BKoodkBd.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
+  /*
+    Without this the default is `font-display: auto`, which browsers treat as a
+    ~3s block period: text styled with this face renders INVISIBLE until the
+    font arrives. `swap` paints the fallback immediately and swaps in BKoodakBd
+    when it loads, so no text is ever missing on a slow connection.
+  */
+  font-display: swap;
 }
 
 @layer base {

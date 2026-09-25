@@ -3,7 +3,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import type { News, Media } from '@/payload-types'
+import { HERO_VARIANTS, isVideo, mediaSrcSet, mediaUrl } from '@/lib/media'
 import { RichText } from '../RichText/RichText'
+import { ArrowLeft } from 'lucide-react'
 
 interface HeroSliderProps {
   news: News[]
@@ -76,10 +78,10 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ news }) => {
       <div className="relative w-full h-full min-h-[500px] md:min-h-0">
         {news.map((item, index) => {
           const thumbnail = item.thumbnail as Media
-          const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || ''
-          const imageUrl = thumbnail?.url 
-            ? (thumbnail.url.startsWith('http') ? thumbnail.url : `${serverUrl}${thumbnail.url}`)
-            : null
+          const imageUrl = mediaUrl(thumbnail, 'hero')
+          const imageSrcSet = mediaSrcSet(thumbnail, HERO_VARIANTS)
+          // The first slide is the largest above-the-fold asset; the rest can wait.
+          const showVideo = isVideo(thumbnail)
 
           return (
             <div
@@ -91,11 +93,28 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ news }) => {
               {/* Image Container */}
               {imageUrl && (
                 <div className="relative md:absolute md:inset-0 z-0 w-full aspect-video md:aspect-auto md:h-full">
-                  <img
-                    src={imageUrl}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
+                  {showVideo ? (
+                    <video
+                      src={imageUrl}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      preload="metadata"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={imageUrl}
+                      srcSet={imageSrcSet}
+                      sizes="100vw"
+                      alt=""
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      fetchPriority={index === 0 ? 'high' : 'auto'}
+                      decoding="async"
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                   {/* Overlay Gradient - Hidden on mobile, visible on desktop */}
                   <div className="hidden md:block absolute inset-0 bg-linear-to-l from-black/80 via-black/20 to-transparent"></div>
                 </div>
@@ -111,16 +130,30 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ news }) => {
                   <RichText content={item.text} />
                 </div>
 
+{/*
+                  Glass, not solid — and independent of `themeColor`.
+
+                  It used to tint itself from the editor-supplied colour: a 15%
+                  wash for the background and `${themeColor}60` for the border.
+                  That concatenation silently yields an invalid colour for
+                  anything but a 6-digit hex (`rgb(...)` becomes `rgb(...)60`),
+                  and a 15% tint of a dark pick sat near 2:1 against the photo.
+
+                  The translucent fill plus blur is the same treatment the
+                  slider's own prev/next arrows use, so the controls inside this
+                  component now read as one set. `group/cta` scopes the arrow's
+                  motion to this button — the section already owns the bare
+                  `group`, which drives those navigation arrows.
+                */}
                 <Link
                   href={`/news/${item.slug || item.id}`}
-                  className="px-6 py-1.5 mb-4 rounded-xl font-bold transition-all duration-300 w-fit border-2 hover:scale-105 hover:shadow-lg active:scale-95 bg-[color-mix(in_srgb,var(--theme-color),transparent_85%)] hover:bg-[color-mix(in_srgb,var(--theme-color),transparent_30%)]"
-                  style={{
-                    '--theme-color': item.themeColor || 'white',
-                    borderColor: item.themeColor ? `${item.themeColor}60` : 'rgba(255,255,255,0.5)',
-                    color: 'white',
-                  } as React.CSSProperties}
+                  className="group/cta mb-4 inline-flex w-fit items-center gap-2 rounded-xl border border-white/30 bg-background/20 px-6 py-3 text-sm font-bold text-white backdrop-blur-md transition-all duration-300 hover:border-white/60 hover:bg-background/40 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:text-base"
                 >
                   مشاهده خبر
+                  <ArrowLeft
+                    className="h-4 w-4 transition-transform duration-300 group-hover/cta:-translate-x-1"
+                    aria-hidden="true"
+                  />
                 </Link>
               </div>
             </div>

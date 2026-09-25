@@ -58,7 +58,7 @@ export const News: CollectionConfig = {
       label: 'تصویر شاخص / هیرو (Thumbnail / Hero BG)',
       required: true,
       admin: {
-        description: 'تصویر، گیف یا ویدیو برای پس‌زمینه هیرو در صفحه اصلی (Image, GIF, Video)',
+        description: 'تصویر یا ویدیوی MP4/WebM برای پس‌زمینه هیرو در صفحه اصلی (Image or MP4/WebM video)',
       },
     },
     {
